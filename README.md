@@ -130,19 +130,7 @@ npm run dev
 
 ---
 
-## 9. Screenshots
-
-**Screenshots:** [Add after building]
-
----
-
-## 10. Team Members
-
-**Team Members:** [Add your names]
-
----
-
-## 11. SDG Alignment
+## 9. SDG Alignment
 
 - **Goal 8: Decent Work and Economic Growth**  
   Supports local artisans by enabling direct visibility and sales opportunities.
