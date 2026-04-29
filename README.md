@@ -97,27 +97,40 @@ Our team **personally visited** all 5 locations and interviewed the owners:
 ---
 
 ## 6. Project Structure
+
+```
 namma-mysuru/
-├── public/images/          # Real photos from field visits
+├── public/
+│   └── images/              # Real photos from field visits
 ├── src/
-│   ├── data/spots.js       # Verified hidden gem data with GPS
+│   ├── data/
+│   │   └── spots.js         # Verified hidden gem data with GPS
 │   ├── pages/
-│   │   ├── RoleSelect.jsx  # Entry screen — Tourist / Customer / Artisan
-│   │   ├── Auth.jsx        # Login + Signup (role-aware)
-│   │   ├── TouristHome.jsx # Browse hidden gems
-│   │   ├── SpotDetail.jsx  # Spot detail + Maps + Reviews
-│   │   ├── CustomerHome.jsx# Browse & buy artisan products
+│   │   ├── RoleSelect.jsx   # Entry screen — Tourist / Customer / Artisan
+│   │   ├── Auth.jsx         # Login + Signup (role-aware)
+│   │   ├── TouristHome.jsx  # Browse hidden gems
+│   │   ├── SpotDetail.jsx   # Spot detail + Maps + Reviews
+│   │   ├── CustomerHome.jsx # Browse & buy artisan products
 │   │   └── ArtisanDashboard.jsx
-│   ├── utils/razorpay.js   # Payment integration
-│   └── firebase.js         # Firebase config
-├── .env                    # API keys (not pushed to GitHub)
+│   ├── utils/
+│   │   └── razorpay.js      # Payment integration
+│   └── firebase.js          # Firebase config
+├── .env                     # API keys (not pushed to GitHub)
 └── README.md
+
+```
+
 ---
 
 ## 7. Firestore Database Structure
-users/      { name, email, role, craftType, location, bio, whatsapp, createdAt }
-products/   { name, category, price, imageUrl, artisanId, artisanName, createdAt }
-reviews/    { spotId, userId, userName, rating, comment, createdAt }
+
+```
+users/    { name, email, role, craftType, location, bio, whatsapp, createdAt }
+products/ { name, category, price, imageUrl, artisanId, artisanName, createdAt }
+reviews/  { spotId, userId, userName, rating, comment, createdAt }
+
+```
+
 ---
 
 ## 8. How to Run Locally
@@ -163,11 +176,11 @@ npm run dev
 
 ## 11. Team Members
 
-1.Shreesha N Gowda 
-2.Shishir Gowda S 
-3.Shishira H V
-4.Sharanya N
-5.Shravanth Kumar M
+1. Shreesha N Gowda
+2. Shishir Gowda S
+3. Shishira H V
+4. Sharanya N
+5. Shravanth Kumar M
 
 
 ---
