@@ -1,7 +1,9 @@
 import { signOut } from "firebase/auth";
-import { useMemo, useState } from "react";
+import { onAuthStateChanged } from "firebase/auth";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../firebase";
+import { openRazorpay } from "../utils/razorpay";
 
 const products = [
   {
@@ -86,20 +88,42 @@ function CustomerHome() {
   const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState("All");
   const [cartItems, setCartItems] = useState([]);
+  const [currentUser, setCurrentUser] = useState({ name: "", email: "" });
 
   const filteredProducts = useMemo(() => {
     if (activeCategory === "All") return products;
     return products.filter((product) => product.category === activeCategory);
   }, [activeCategory]);
 
-  const openRazorpay = ({ amount, productName, artisanName, productId }) => {
-    setCartItems((prev) => {
-      if (prev.includes(productId)) return prev;
-      return [...prev, productId];
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        setCurrentUser({ name: "", email: "" });
+        return;
+      }
+
+      setCurrentUser({
+        name: user.displayName || user.email?.split("@")[0] || "Customer",
+        email: user.email || "",
+      });
     });
-    alert(
-      `Razorpay will be connected soon\n\nProduct: ${productName}\nArtisan: ${artisanName}\nAmount: ₹${amount}`
-    );
+
+    return () => unsubscribe();
+  }, []);
+
+  const handleBuyNow = (product) => {
+    setCartItems((prev) => {
+      if (prev.includes(product.id)) return prev;
+      return [...prev, product.id];
+    });
+
+    openRazorpay({
+      amount: product.price,
+      productName: product.name,
+      artisanName: product.artisan,
+      userName: currentUser.name,
+      userEmail: currentUser.email,
+    });
   };
 
   const handleLogout = async () => {
@@ -181,14 +205,7 @@ function CustomerHome() {
                 <div className="mt-4 grid grid-cols-2 gap-2">
                   <button
                     type="button"
-                    onClick={() =>
-                      openRazorpay({
-                        amount: product.price,
-                        productName: product.name,
-                        artisanName: product.artisan,
-                        productId: product.id,
-                      })
-                    }
+                    onClick={() => handleBuyNow(product)}
                     className="rounded-xl bg-orange-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-orange-700"
                   >
                     Buy Now
