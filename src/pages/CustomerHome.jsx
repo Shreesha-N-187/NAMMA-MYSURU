@@ -14,7 +14,7 @@ const products = [
     artisan: "Silk Weaver's Corner",
     artisanId: "a1",
     description: "Handwoven pure Mysore silk with traditional zari border",
-    image: "https://picsum.photos/seed/silk/300/300",
+    image: "/images/silk.jpeg",
     whatsapp: "919876543210",
   },
   {
@@ -25,7 +25,7 @@ const products = [
     artisan: "Ramu Crafts",
     artisanId: "a2",
     description: "Hand-carved aromatic sandalwood elephant, 6 inches",
-    image: "https://picsum.photos/seed/sandal/300/300",
+    image: "/images/elephant.jpeg",
     whatsapp: "919876543211",
   },
   {
@@ -36,7 +36,7 @@ const products = [
     artisan: "Heritage Inlay Studio",
     artisanId: "a3",
     description: "Rosewood box with intricate ivory-style inlay work",
-    image: "https://picsum.photos/seed/inlay/300/300",
+    image: "/images/inlay-box.jpg",
     whatsapp: "919876543212",
   },
   {
@@ -47,7 +47,7 @@ const products = [
     artisan: "Ramu Crafts",
     artisanId: "a2",
     description: "Polished rosewood frame, 5x7 inch, hand-finished",
-    image: "https://picsum.photos/seed/frame/300/300",
+    image: "/images/rosewoodimage.jpg",
     whatsapp: "919876543211",
   },
   {
@@ -58,7 +58,7 @@ const products = [
     artisan: "Loco Artisans Chocolates",
     artisanId: "a4",
     description: "Authentic Mysore Pak (500g) made with pure ghee",
-    image: "https://picsum.photos/seed/mysopak/300/300",
+    image: "/images/mysore-pak.jpg",
     whatsapp: "919876543213",
   },
   {
@@ -69,7 +69,7 @@ const products = [
     artisan: "Loco Artisans Chocolates",
     artisanId: "a4",
     description: "Sugar-free Indian dark chocolate with Pomelo bits (250g)",
-    image: "https://picsum.photos/seed/choc/300/300",
+    image: "/images/darra-confectionery-the-chocolate-boutique-vidyaranyapuram-mysore-gift-shops-i74tujlzjq.jpg",
     whatsapp: "919876543213",
   },
 ];

@@ -18,7 +18,7 @@ export const spotsData = [
     rating: 4.8,
     reviewCount: 12,
     tags: ["Nature", "Homestay", "Medicinal Plants", "Peaceful"],
-    image: "https://picsum.photos/seed/hasirumane/400/250",
+    image: "/images/hasirumane.jpg",
   },
   {
     id: "2",
@@ -37,7 +37,7 @@ export const spotsData = [
     rating: 4.7,
     reviewCount: 9,
     tags: ["Sugar-Free", "Bakery", "Healthy", "Artisan Chocolate"],
-    image: "https://picsum.photos/seed/locoartisans/400/250",
+    image: "/images/loco-artisan-chocolates.jpg",
   },
   {
     id: "3",
@@ -56,7 +56,7 @@ export const spotsData = [
     rating: 4.9,
     reviewCount: 21,
     tags: ["Cats", "Unique", "Family-Friendly", "Art Gallery"],
-    image: "https://picsum.photos/seed/jinmincat/400/250",
+    image: "/images/jin-min-catworld.jpeg",
   },
   {
     id: "4",
@@ -74,14 +74,14 @@ export const spotsData = [
     rating: 4.6,
     reviewCount: 15,
     tags: ["Anime", "Themed Cafe", "Youth", "Northeast Cuisine"],
-    image: "https://picsum.photos/seed/uchiha/400/250",
+    image: "/images/uchiha-cafe.jpeg",
   },
   {
     id: "5",
     name: "Mr. Co-Cane",
     category: "Food",
-    location: "Gokulam, Mysuru",
-    address: "Gokulam, Mysuru (exact address TBD)",
+    location: "Kuvempu Nagar, Mysuru",
+    address: "Kuvempu Nagar, Mysuru 570023",
     lat: 12.3375,
     lng: 76.626,
     contact: "Owner",
@@ -91,6 +91,6 @@ export const spotsData = [
     rating: 4.5,
     reviewCount: 7,
     tags: ["Healthy", "Juice Bar", "Sugar-Free", "Local Favourite"],
-    image: "https://picsum.photos/seed/cocane/400/250",
+    image: "/images/cococaine.jpeg",
   },
 ];
