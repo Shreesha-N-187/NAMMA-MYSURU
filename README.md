@@ -7,8 +7,11 @@
 ![Vercel](https://img.shields.io/badge/Deployed-Vercel-black?logo=vercel)
 
 **Team:** Think Crafters (Batch 5)
+
 **College:** Vidyavardhaka College of Engineering (VVCE), Mysuru
+
 **Department:** Computer Science & Engineering
+
 **Event:** Design Thinking And Tinkering Lab Project
 
 🌐 **Live Demo:** [namma-mysuru.vercel.app](https://namma-mysuru.vercel.app)
@@ -119,7 +122,6 @@ namma-mysuru/
 └── README.md
 
 ```
-
 ---
 
 ## 7. Firestore Database Structure
@@ -130,7 +132,6 @@ products/ { name, category, price, imageUrl, artisanId, artisanName, createdAt }
 reviews/  { spotId, userId, userName, rating, comment, createdAt }
 
 ```
-
 ---
 
 ## 8. How to Run Locally
@@ -181,7 +182,6 @@ npm run dev
 3. Shishira H V
 4. Sharanya N
 5. Shravanth Kumar M
-
 
 ---
 
