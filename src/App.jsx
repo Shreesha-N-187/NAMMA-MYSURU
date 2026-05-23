@@ -1,3 +1,4 @@
+import AdminPanel from "./pages/AdminPanel";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ArtisanDashboard from "./pages/ArtisanDashboard";
@@ -12,6 +13,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+      <Route path="/admin" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
         <Route path="/" element={<RoleSelect />} />
         <Route path="/auth" element={<Auth />} />
 

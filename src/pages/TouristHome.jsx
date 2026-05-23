@@ -1,8 +1,7 @@
 import { signOut } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, collection, getDocs } from "firebase/firestore";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { spotsData } from "../data/spots";
 import { auth, db } from "../firebase";
 
 const categoryStyles = {
@@ -17,6 +16,8 @@ function TouristHome() {
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
   const [wishlist, setWishlist] = useState([]);
+  const [spotsData, setSpotsData] = useState([])
+  const [loadingSpots, setLoadingSpots] = useState(true)
 
   useEffect(() => {
     const savedWishlist = localStorage.getItem("wishlist");
@@ -41,10 +42,26 @@ function TouristHome() {
         const data = userSnap.data();
         setUsername(data.name || "Traveler");
       }
-    };
+    }
+  fetchUser();
+}, []);
 
-    fetchUser();
-  }, []);
+    useEffect(() => {
+  async function fetchSpots() {
+    try {
+      const snapshot = await getDocs(collection(db, "spots"))
+      const data = snapshot.docs.map(d => ({ id: d.id, ...d.data() }))
+      setSpotsData(data)
+    } catch (error) {
+      const { default: fallback } = await import("../data/spots")
+      setSpotsData(fallback)
+    } finally {
+      setLoadingSpots(false)
+    }
+  }
+  fetchSpots()
+}, [])
+
 
   const filteredSpots = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -57,7 +74,7 @@ function TouristHome() {
         spot.location.toLowerCase().includes(query);
       return matchesCategory && matchesSearch;
     });
-  }, [search, activeCategory]);
+  }, [search, activeCategory, spotsData]);
 
   const toggleWishlist = (spotId) => {
     const next = wishlist.includes(spotId)
@@ -89,6 +106,13 @@ function TouristHome() {
     );
   };
 
+  if (loadingSpots) {
+  return (
+    <div className="flex items-center justify-center h-64">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600" />
+    </div>
+  )
+}
   return (
     <main className="min-h-screen bg-gradient-to-b from-amber-50 via-orange-50 to-emerald-50">
       <nav className="sticky top-0 z-20 border-b border-orange-200/70 bg-white/80 backdrop-blur">
