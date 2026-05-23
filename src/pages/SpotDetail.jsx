@@ -1,3 +1,5 @@
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage"
+import { auth, db, storage } from "../firebase"
 import { onAuthStateChanged } from "firebase/auth";
 import {
   addDoc,
@@ -12,7 +14,7 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { spotsData } from "../data/spots";
-import { auth, db } from "../firebase";
+
 
 const categoryStyles = {
   Food: "bg-orange-100 text-orange-800 border-orange-200",
@@ -23,6 +25,9 @@ const categoryStyles = {
 function SpotDetail() {
   const navigate = useNavigate();
   const { id } = useParams();
+
+  const [reviewPhoto, setReviewPhoto] = useState(null)
+const [uploading, setUploading] = useState(false)
 
   const [wishlist, setWishlist] = useState([]);
   const [reviews, setReviews] = useState([]);
@@ -102,32 +107,40 @@ function SpotDetail() {
     event.preventDefault();
     setReviewError("");
     if (!currentUser) return;
-    if (!rating) {
-      setReviewError("Please select a rating.");
-      return;
-    }
-    if (!comment.trim()) {
-      setReviewError("Please write a short comment.");
-      return;
-    }
-
+    if (!rating) { setReviewError("Please select a rating."); return; }
+    if (!comment.trim()) { setReviewError("Please write a short comment."); return; }
+  
     setSubmitting(true);
+    let photoUrl = null;
+  
     try {
+      if (reviewPhoto) {
+        setUploading(true);
+        const storageRef = ref(storage, `reviews/${spot.id}/${Date.now()}_${reviewPhoto.name}`);
+        const uploadResult = await uploadBytes(storageRef, reviewPhoto);
+        photoUrl = await getDownloadURL(uploadResult.ref);
+        setUploading(false);
+      }
+  
       await addDoc(collection(db, "reviews"), {
         spotId: id,
         userId: currentUser.uid,
         userName: userName || "Traveler",
         rating,
         comment: comment.trim(),
+        photoUrl: photoUrl || null,
         createdAt: serverTimestamp(),
       });
+  
       setRating(0);
       setComment("");
+      setReviewPhoto(null);
       await loadReviews();
     } catch {
       setReviewError("Could not submit review. Please try again.");
     } finally {
       setSubmitting(false);
+      setUploading(false);
     }
   };
 
@@ -355,6 +368,14 @@ function SpotDetail() {
                   </div>
                   <p className="mt-1 text-amber-500">{"★".repeat(review.rating)}</p>
                   <p className="mt-1 text-sm text-slate-700">{review.comment}</p>
+                  {review.photoUrl && (
+  <img
+    src={review.photoUrl}
+    alt="Review photo"
+    className="mt-2 rounded-xl w-full max-h-48 object-cover cursor-pointer"
+    onClick={() => window.open(review.photoUrl, '_blank')}
+  />
+)}
                 </article>
               ))}
             </div>
@@ -362,52 +383,62 @@ function SpotDetail() {
         </section>
 
         {currentUser && (
-          <section className="mt-5 rounded-3xl border border-orange-200 bg-white p-5 shadow-sm">
-            <h2 className="text-xl font-bold text-orange-950">Add Review</h2>
-            <form onSubmit={handleSubmitReview} className="mt-3 space-y-4">
-              <div>
-                <p className="mb-2 text-sm font-medium text-orange-900">Your Rating</p>
-                <div className="flex items-center gap-1 text-2xl">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                      key={star}
-                      type="button"
-                      onClick={() => setRating(star)}
-                      className={star <= rating ? "text-amber-500" : "text-amber-200"}
-                      aria-label={`Rate ${star} stars`}
-                    >
-                      ★
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <label className="mb-1 block text-sm font-medium text-orange-900">
-                  Comment
-                </label>
-                <textarea
-                  value={comment}
-                  onChange={(event) => setComment(event.target.value)}
-                  rows={4}
-                  className="w-full rounded-xl border border-orange-200 bg-orange-50 px-3 py-2 text-sm outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-200"
-                  placeholder="Share your experience..."
-                />
-              </div>
-              {reviewError && (
-                <p className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-                  {reviewError}
-                </p>
-              )}
-              <button
-                type="submit"
-                disabled={submitting}
-                className="rounded-xl bg-orange-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-orange-700 disabled:opacity-60"
-              >
-                {submitting ? "Submitting..." : "Submit Review"}
-              </button>
-            </form>
-          </section>
+  <section className="mt-5 rounded-3xl border border-orange-200 bg-white p-5 shadow-sm">
+    <h2 className="text-xl font-bold text-orange-950">Add Review</h2>
+    <form onSubmit={handleSubmitReview} className="mt-3 space-y-4">
+      <div>
+        <p className="mb-2 text-sm font-medium text-orange-900">Your Rating</p>
+        <div className="flex items-center gap-1 text-2xl">
+          {[1, 2, 3, 4, 5].map((star) => (
+            <button
+              key={star}
+              type="button"
+              onClick={() => setRating(star)}
+              className={star <= rating ? "text-amber-500" : "text-amber-200"}
+              aria-label={`Rate ${star} stars`}
+            >★</button>
+          ))}
+        </div>
+      </div>
+      <div>
+        <label className="mb-1 block text-sm font-medium text-orange-900">Comment</label>
+        <textarea
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
+          rows={4}
+          className="w-full rounded-xl border border-orange-200 bg-orange-50 px-3 py-2 text-sm outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-200"
+          placeholder="Share your experience..."
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Add a Photo (optional)
+        </label>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(e) => setReviewPhoto(e.target.files[0])}
+          className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-medium file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100"
+        />
+        {reviewPhoto && (
+          <p className="text-xs text-gray-500 mt-1">Selected: {reviewPhoto.name}</p>
         )}
+      </div>
+      {reviewError && (
+        <p className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+          {reviewError}
+        </p>
+      )}
+      <button
+        type="submit"
+        disabled={submitting || uploading}
+        className="rounded-xl bg-orange-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-orange-700 disabled:opacity-60"
+      >
+        {uploading ? "Uploading photo..." : submitting ? "Submitting..." : "Submit Review"}
+      </button>
+    </form>
+  </section>
+)}
       </div>
 
       <button
