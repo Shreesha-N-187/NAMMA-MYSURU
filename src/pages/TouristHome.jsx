@@ -126,6 +126,12 @@ function TouristHome() {
               Hi, {username}
             </p>
             <button
+  onClick={() => navigate("/itinerary")}
+  className="text-sm font-medium text-orange-600 hover:text-orange-700 border border-orange-300 rounded-full px-3 py-1"
+>
+  🗓️ Plan My Day
+</button>
+            <button
               type="button"
               className="relative rounded-full bg-orange-100 px-3 py-1.5 text-lg text-orange-700"
               aria-label="Wishlist"

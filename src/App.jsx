@@ -1,3 +1,4 @@
+import ItineraryBuilder from "./pages/ItineraryBuilder";
 import AdminPanel from "./pages/AdminPanel";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -14,6 +15,7 @@ function App() {
     <BrowserRouter>
       <Routes>
       <Route path="/admin" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
+      <Route path="/itinerary" element={<ProtectedRoute><ItineraryBuilder /></ProtectedRoute>} />
         <Route path="/" element={<RoleSelect />} />
         <Route path="/auth" element={<Auth />} />
 
