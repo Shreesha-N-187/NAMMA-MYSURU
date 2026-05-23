@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -6,6 +7,9 @@ import {
   updateDoc,
   collection,
   getDocs,
+  addDoc,
+  deleteDoc,
+  serverTimestamp,
 } from "firebase/firestore";
 import { auth, db } from "../firebase";
 import { spotsData } from "../data/spots";
@@ -642,6 +646,136 @@ function SpotEditorSection() {
   );
 }
 
+function EventsSection() {
+  const [events, setEvents] = useState([]);
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [date, setDate] = useState("");
+  const [location, setLocation] = useState("");
+  const [category, setCategory] = useState("Festival");
+  const [isFeatured, setIsFeatured] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    async function fetchEvents() {
+      const snapshot = await getDocs(collection(db, "events"));
+      const data = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+      data.sort((a, b) => (a.date > b.date ? 1 : -1));
+      setEvents(data);
+    }
+    fetchEvents();
+  }, []);
+
+  async function handleAddEvent() {
+    if (!name || !date) return;
+    setSaving(true);
+    try {
+      const docRef = await addDoc(collection(db, "events"), {
+        name, description, date, location,
+        category, featured: isFeatured,
+        createdAt: serverTimestamp(),
+      });
+      setEvents((prev) => [...prev, { id: docRef.id, name, description, date, location, category, featured: isFeatured }]);
+      setName(""); setDescription(""); setDate("");
+      setLocation(""); setCategory("Festival"); setIsFeatured(false);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleDelete(id) {
+    if (!window.confirm("Delete this event?")) return;
+    await deleteDoc(doc(db, "events", id));
+    setEvents((prev) => prev.filter((e) => e.id !== id));
+  }
+
+  const inputCls = "w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-400 transition";
+  const labelCls = "block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1";
+
+  return (
+    <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+      <SectionHeader
+        step="Step 3"
+        title="Upcoming Events & Festivals"
+        subtitle="Add events that appear on the tourist home page."
+      />
+
+      {/* Add Event Form */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+        <div className="sm:col-span-2">
+          <label className={labelCls}>Event Name</label>
+          <input type="text" value={name} onChange={(e) => setName(e.target.value)} className={inputCls} placeholder="e.g. Dasara Festival" />
+        </div>
+        <div className="sm:col-span-2">
+          <label className={labelCls}>Description</label>
+          <textarea rows={2} value={description} onChange={(e) => setDescription(e.target.value)} className={inputCls} placeholder="Brief description..." />
+        </div>
+        <div>
+          <label className={labelCls}>Date</label>
+          <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className={inputCls} />
+        </div>
+        <div>
+          <label className={labelCls}>Location in Mysuru</label>
+          <input type="text" value={location} onChange={(e) => setLocation(e.target.value)} className={inputCls} placeholder="e.g. Mysuru Palace" />
+        </div>
+        <div>
+          <label className={labelCls}>Category</label>
+          <select value={category} onChange={(e) => setCategory(e.target.value)} className={inputCls}>
+            <option value="Festival">Festival</option>
+            <option value="Cultural">Cultural</option>
+            <option value="Food">Food</option>
+            <option value="Market">Market</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div className="flex items-center gap-2 mt-5">
+          <input type="checkbox" checked={isFeatured} onChange={(e) => setIsFeatured(e.target.checked)} className="w-4 h-4 accent-amber-500" />
+          <label className="text-sm text-gray-700 font-medium">⭐ Featured Event</label>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-3 mb-6">
+        <button
+          onClick={handleAddEvent}
+          disabled={saving}
+          className="bg-amber-500 hover:bg-amber-600 disabled:opacity-60 text-white text-sm font-medium px-5 py-2 rounded-lg transition-colors"
+        >
+          {saving ? "Adding..." : "Add Event"}
+        </button>
+        {saved && <span className="text-sm text-green-600 font-medium">Added! ✅</span>}
+      </div>
+
+      {/* Events List */}
+      {events.length === 0 ? (
+        <p className="text-sm text-gray-400">No events yet.</p>
+      ) : (
+        <div className="space-y-3">
+          {events.map((event) => (
+            <div key={event.id} className="flex items-center justify-between bg-gray-50 rounded-lg px-4 py-3 border border-gray-100">
+              <div>
+                <p className="text-sm font-semibold text-gray-800">
+                  {event.name} {event.featured && <span className="text-xs text-amber-500">⭐</span>}
+                </p>
+                <p className="text-xs text-gray-400">{event.date} · {event.location} · {event.category}</p>
+              </div>
+              <button
+                onClick={() => handleDelete(event.id)}
+                className="text-xs text-red-500 hover:text-red-700 font-medium px-3 py-1 rounded-lg hover:bg-red-50 transition-colors"
+              >
+                Delete
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 // ─── Main AdminPanel ───────────────────────────────────────────────────────────
 
 export default function AdminPanel() {
@@ -719,6 +853,7 @@ export default function AdminPanel() {
 
         {/* Step 2 — Spot Editor (only after migration) */}
         {migrationDone && <SpotEditorSection />}
+        {migrationDone && <EventsSection />}
       </main>
     </div>
   );

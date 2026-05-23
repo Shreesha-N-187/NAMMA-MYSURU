@@ -1,3 +1,4 @@
+import EventsBanner from "../components/EventsBanner";
 import NearbySpots from "../components/NearbySpots";
 import { signOut } from "firebase/auth";
 import { doc, getDoc, collection, getDocs } from "firebase/firestore";
@@ -160,6 +161,7 @@ function TouristHome() {
           <p className="mt-1 text-sm text-orange-900/80">
             Discover curated local places verified by our team
           </p>
+          <EventsBanner />
 
           <div className="mt-4">
             <input
