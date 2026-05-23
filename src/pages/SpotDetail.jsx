@@ -195,48 +195,65 @@ function SpotDetail() {
           <p className="mt-1 text-sm text-orange-900/85">Contact: {spot.contact}</p>
         </section>
 
-        <section className="mt-5 flex gap-3 overflow-x-auto pb-2">
-          {spot.openTime && (
-            <div className="min-w-[220px] rounded-2xl border border-orange-200 bg-white p-4 shadow-sm">
-              <p className="text-xs font-semibold uppercase tracking-wide text-orange-700">
-                Opening Time
-              </p>
-              <p className="mt-1 text-sm text-slate-700">{spot.openTime}</p>
-            </div>
-          )}
-          {spot.price && (
-            <div className="min-w-[220px] rounded-2xl border border-orange-200 bg-white p-4 shadow-sm">
-              <p className="text-xs font-semibold uppercase tracking-wide text-orange-700">
-                Price
-              </p>
-              <p className="mt-1 text-sm text-slate-700">{spot.price}</p>
-            </div>
-          )}
-          {spot.bestTime && (
-            <div className="min-w-[220px] rounded-2xl border border-orange-200 bg-white p-4 shadow-sm">
-              <p className="text-xs font-semibold uppercase tracking-wide text-orange-700">
-                Best Time to Visit
-              </p>
-              <p className="mt-1 text-sm text-slate-700">{spot.bestTime}</p>
-            </div>
-          )}
-          {spot.peakSeason && (
-            <div className="min-w-[220px] rounded-2xl border border-orange-200 bg-white p-4 shadow-sm">
-              <p className="text-xs font-semibold uppercase tracking-wide text-orange-700">
-                Peak Season
-              </p>
-              <p className="mt-1 text-sm text-slate-700">{spot.peakSeason}</p>
-            </div>
-          )}
-          {spot.parking && (
-            <div className="min-w-[220px] rounded-2xl border border-orange-200 bg-white p-4 shadow-sm">
-              <p className="text-xs font-semibold uppercase tracking-wide text-orange-700">
-                Parking
-              </p>
-              <p className="mt-1 text-sm text-slate-700">Parking Available ✓</p>
-            </div>
-          )}
-        </section>
+        <section className="mt-5 rounded-3xl border border-orange-200 bg-white p-5 shadow-sm">
+  {/* Special banner for Jin Min Cat World */}
+  {spot.id === "3" && (
+    <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 mb-4 flex items-start gap-3">
+      <span className="text-2xl">🐱</span>
+      <p className="text-orange-800 text-sm font-medium">
+        Best visited after 4 PM — the cats wake up from their afternoon nap
+        and become playful and interactive!
+      </p>
+    </div>
+  )}
+
+  {/* Row 1 — Timing */}
+  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
+    <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+      <p className="text-xs text-gray-500 mb-1 flex items-center gap-1">🕐 Open Hours</p>
+      <p className="text-sm font-medium text-gray-800">{spot.openHours}</p>
+    </div>
+    <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+      <p className="text-xs text-gray-500 mb-1 flex items-center gap-1">📅 Open Days</p>
+      <p className="text-sm font-medium text-gray-800">{spot.openDays}</p>
+    </div>
+    <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+      <p className="text-xs text-gray-500 mb-1 flex items-center gap-1">
+        ⭐ Best Time
+        {spot.id === "3" && (
+          <span className="ml-1 text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full border border-orange-200">
+            Important ⚠️
+          </span>
+        )}
+      </p>
+      <p className="text-sm font-medium text-gray-800">{spot.bestTimeToVisit}</p>
+    </div>
+  </div>
+
+  {/* Row 2 — Practical */}
+  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+    <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+      <p className="text-xs text-gray-500 mb-1 flex items-center gap-1">🅿️ Parking</p>
+      <p className={`text-sm font-medium ${spot.parkingAvailable ? "text-green-600" : "text-red-500"}`}>
+        {spot.parkingAvailable ? "Available ✓" : "Not Available"}
+      </p>
+      <p className="text-xs text-gray-400 mt-1">{spot.parkingNote}</p>
+    </div>
+    <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+      <p className="text-xs text-gray-500 mb-1 flex items-center gap-1">👥 Crowd Level</p>
+      <p className={`text-sm font-medium ${
+        spot.crowdLevel === "low" ? "text-green-600" :
+        spot.crowdLevel === "medium" ? "text-orange-500" : "text-red-500"
+      }`}>
+        {spot.crowdLevel}
+      </p>
+    </div>
+    <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+      <p className="text-xs text-gray-500 mb-1 flex items-center gap-1">💰 Price Range</p>
+      <p className="text-sm font-medium text-gray-800">{spot.priceRange}</p>
+    </div>
+  </div>
+</section>
 
         <section className="mt-5 rounded-3xl border border-orange-200 bg-white p-5 shadow-sm">
           <h2 className="text-xl font-bold text-orange-950">About this place</h2>
