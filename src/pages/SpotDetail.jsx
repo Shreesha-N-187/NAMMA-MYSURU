@@ -33,6 +33,7 @@ function SpotDetail() {
   const [comment, setComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [reviewError, setReviewError] = useState("");
+  const [copied, setCopied] = useState(false)
   const mapsEmbedApiKey = import.meta.env.VITE_GOOGLE_MAPS_EMBED_API_KEY;
 
   const spot = useMemo(() => spotsData.find((item) => item.id === id), [id]);
@@ -275,6 +276,44 @@ function SpotDetail() {
             Open in Google Maps →
           </a>
         </section>
+        {/* Share This Spot */}
+<div className="bg-white rounded-2xl p-6 shadow-sm mb-6">
+  <h3 className="font-semibold text-lg mb-3">Share This Spot 📤</h3>
+  <div className="flex flex-wrap gap-3">
+    {/* WhatsApp */}
+    <button
+      className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-full text-sm font-medium transition-colors"
+      onClick={() => {
+        const text = encodeURIComponent(
+          `Check out ${spot.name} in Mysuru! 📍 ${spot.address}\nDiscover more hidden gems on Namma Mysuru: https://namma-mysuru.vercel.app/spot/${spot.id}`
+        )
+        window.open(`https://wa.me/?text=${text}`, '_blank')
+      }}
+    >
+      💬 Share on WhatsApp
+    </button>
+
+    {/* Copy Link */}
+    <button
+      className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-full text-sm font-medium transition-colors"
+      onClick={() => {
+        navigator.clipboard.writeText(`https://namma-mysuru.vercel.app/spot/${spot.id}`)
+        setCopied(true)
+        setTimeout(() => setCopied(false), 2000)
+      }}
+    >
+      {copied ? "✅ Copied!" : "📋 Copy Link"}
+    </button>
+
+    {/* Instagram */}
+    <button
+      className="flex items-center gap-2 bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-full text-sm font-medium transition-colors"
+      onClick={() => alert("Screenshot this page and share with #NammaMysuru #HiddenMysuru")}
+    >
+      📸 Instagram
+    </button>
+  </div>
+</div>
 
         <section className="mt-5 rounded-3xl border border-orange-200 bg-white p-5 shadow-sm">
           <h2 className="text-xl font-bold text-orange-950">Reviews</h2>
