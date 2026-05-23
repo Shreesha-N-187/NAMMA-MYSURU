@@ -1,3 +1,4 @@
+import NearbySpots from "../components/NearbySpots";
 import { signOut } from "firebase/auth";
 import { doc, getDoc, collection, getDocs } from "firebase/firestore";
 import { useEffect, useMemo, useState } from "react";
@@ -181,6 +182,7 @@ function TouristHome() {
             ))}
           </div>
         </div>
+        <NearbySpots spots={spotsData} />
 
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
           {filteredSpots.map((spot) => (
