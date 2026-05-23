@@ -1,3 +1,4 @@
+import ChatBot from "./components/ChatBot";
 import ItineraryBuilder from "./pages/ItineraryBuilder";
 import AdminPanel from "./pages/AdminPanel";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
@@ -60,6 +61,7 @@ function App() {
           }
         />
       </Routes>
+      <ChatBot />
     </BrowserRouter>
   );
 }
