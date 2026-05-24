@@ -7,6 +7,7 @@ import ArtisanDashboard from "./pages/ArtisanDashboard";
 import ArtisanProfile from "./pages/ArtisanProfile";
 import Auth from "./pages/Auth";
 import CustomerHome from "./pages/CustomerHome";
+import CartPage from "./pages/CartPage"; // Added Cart Page Import
 import RoleSelect from "./pages/RoleSelect";
 import SpotDetail from "./pages/SpotDetail";
 import TouristHome from "./pages/TouristHome";
@@ -15,8 +16,8 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-      <Route path="/admin" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
-      <Route path="/itinerary" element={<ProtectedRoute><ItineraryBuilder /></ProtectedRoute>} />
+        <Route path="/admin" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
+        <Route path="/itinerary" element={<ProtectedRoute><ItineraryBuilder /></ProtectedRoute>} />
         <Route path="/" element={<RoleSelect />} />
         <Route path="/auth" element={<Auth />} />
 
@@ -41,6 +42,15 @@ function App() {
           element={
             <ProtectedRoute>
               <CustomerHome />
+            </ProtectedRoute>
+          }
+        />
+        {/* Added Protected Cart Route */}
+        <Route
+          path="/cart"
+          element={
+            <ProtectedRoute>
+              <CartPage />
             </ProtectedRoute>
           }
         />
