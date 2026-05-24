@@ -1,78 +1,12 @@
 import { signOut } from "firebase/auth";
 import { onAuthStateChanged } from "firebase/auth";
+import { collection, getDocs, query, orderBy } from "firebase/firestore";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { auth } from "../firebase";
+import { auth, db } from "../firebase";
 import { openRazorpay } from "../utils/razorpay";
 
-const products = [
-  {
-    id: "p1",
-    name: "Mysore Silk Saree",
-    category: "Silk",
-    price: 3500,
-    artisan: "Silk Weaver's Corner",
-    artisanId: "a1",
-    description: "Handwoven pure Mysore silk with traditional zari border",
-    image: "/images/silk.jpeg",
-    whatsapp: "919876543210",
-  },
-  {
-    id: "p2",
-    name: "Sandalwood Elephant Figurine",
-    category: "Sandalwood",
-    price: 850,
-    artisan: "Ramu Crafts",
-    artisanId: "a2",
-    description: "Hand-carved aromatic sandalwood elephant, 6 inches",
-    image: "/images/elephant.jpeg",
-    whatsapp: "919876543211",
-  },
-  {
-    id: "p3",
-    name: "Inlay Art Jewellery Box",
-    category: "Inlay Art",
-    price: 1200,
-    artisan: "Heritage Inlay Studio",
-    artisanId: "a3",
-    description: "Rosewood box with intricate ivory-style inlay work",
-    image: "/images/inlay-box.jpg",
-    whatsapp: "919876543212",
-  },
-  {
-    id: "p4",
-    name: "Rosewood Photo Frame",
-    category: "Sandalwood",
-    price: 650,
-    artisan: "Ramu Crafts",
-    artisanId: "a2",
-    description: "Polished rosewood frame, 5x7 inch, hand-finished",
-    image: "/images/rosewoodimage.jpg",
-    whatsapp: "919876543211",
-  },
-  {
-    id: "p5",
-    name: "Original Mysore Pak Box",
-    category: "Food Products",
-    price: 280,
-    artisan: "Loco Artisans Chocolates",
-    artisanId: "a4",
-    description: "Authentic Mysore Pak (500g) made with pure ghee",
-    image: "/images/mysore-pak.jpg",
-    whatsapp: "919876543213",
-  },
-  {
-    id: "p6",
-    name: "Artisan Dark Chocolate Box",
-    category: "Food Products",
-    price: 350,
-    artisan: "Loco Artisans Chocolates",
-    artisanId: "a4",
-    description: "Sugar-free Indian dark chocolate with Pomelo bits (250g)",
-    image: "/images/darra-confectionery-the-chocolate-boutique-vidyaranyapuram-mysore-gift-shops-i74tujlzjq.jpg",
-    whatsapp: "919876543213",
-  },
-];
+
 
 const categories = [
   "All",
@@ -89,11 +23,34 @@ function CustomerHome() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [cartItems, setCartItems] = useState([]);
   const [currentUser, setCurrentUser] = useState({ name: "", email: "" });
+  const [firestoreProducts, setFirestoreProducts] = useState([]);
+  const [loadingProducts, setLoadingProducts] = useState(true);
 
   const filteredProducts = useMemo(() => {
-    if (activeCategory === "All") return products;
-    return products.filter((product) => product.category === activeCategory);
-  }, [activeCategory]);
+    if (activeCategory === "All") return firestoreProducts;
+    return firestoreProducts.filter((product) => product.category === activeCategory);
+  }, [activeCategory, firestoreProducts]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const q = query(collection(db, "products"), orderBy("createdAt", "desc"));
+        const snapshot = await getDocs(q);
+        const fetched = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+          artisan: doc.data().artisanName || "Local Artisan",
+          image: doc.data().imageUrl || "https://picsum.photos/seed/" + doc.id + "/400/400",
+        }));
+        setFirestoreProducts(fetched);
+      } catch (err) {
+        console.error("Error fetching products:", err);
+      } finally {
+        setLoadingProducts(false);
+      }
+    };
+    fetchProducts();
+  }, []);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -101,13 +58,11 @@ function CustomerHome() {
         setCurrentUser({ name: "", email: "" });
         return;
       }
-
       setCurrentUser({
         name: user.displayName || user.email?.split("@")[0] || "Customer",
         email: user.email || "",
       });
     });
-
     return () => unsubscribe();
   }, []);
 
@@ -116,7 +71,6 @@ function CustomerHome() {
       if (prev.includes(product.id)) return prev;
       return [...prev, product.id];
     });
-
     openRazorpay({
       amount: product.price,
       productName: product.name,
@@ -184,7 +138,19 @@ function CustomerHome() {
         </div>
 
         <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {filteredProducts.map((product) => (
+          {loadingProducts && (
+            <div className="col-span-full flex justify-center py-12">
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-orange-600" />
+            </div>
+          )}
+
+          {!loadingProducts && filteredProducts.length === 0 && (
+            <div className="col-span-full text-center py-12 text-slate-400">
+              No products found.
+            </div>
+          )}
+
+          {!loadingProducts && filteredProducts.map((product) => (
             <article
               key={product.id}
               className="overflow-hidden rounded-3xl border border-orange-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
