@@ -52,14 +52,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/artisan/:uid"
-          element={
-            <ProtectedRoute>
-              <ArtisanProfile />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/artisan/:uid" element={<ArtisanProfile />} />
       </Routes>
       <ChatBot />
     </BrowserRouter>

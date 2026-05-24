@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom"
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
 import { auth, db } from "../firebase";
@@ -35,6 +35,8 @@ function getFriendlyError(code) {
 
 function Auth() {
   const navigate = useNavigate();
+  const location = useLocation()
+const from = location.state?.from
   const [isSignup, setIsSignup] = useState(false);
   const [selectedRole, setSelectedRole] = useState("tourist");
   const [showPassword, setShowPassword] = useState(false);
@@ -71,7 +73,7 @@ function Auth() {
       role: selectedRole,
       createdAt: serverTimestamp(),
     });
-    navigate(getRedirectPath(selectedRole));
+    navigate(from && from !== "/auth" ? from : getRedirectPath(selectedRole), { replace: true });
   };
 
   const handleLogin = async () => {
@@ -79,7 +81,7 @@ function Auth() {
     const userRef = doc(db, "users", credential.user.uid);
     const userSnap = await getDoc(userRef);
     const roleFromDb = userSnap.exists() ? userSnap.data().role : null;
-    navigate(getRedirectPath(roleFromDb));
+    navigate(from && from !== "/auth" ? from : getRedirectPath(roleFromDb), { replace: true });
   };
 
   const handleSubmit = async (event) => {

@@ -1,34 +1,36 @@
-import { onAuthStateChanged } from "firebase/auth";
-import { useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
-import { auth } from "../firebase";
+import { useEffect, useState } from "react"
+import { Navigate, useLocation } from "react-router-dom"
+import { onAuthStateChanged } from "firebase/auth"
+import { auth } from "../firebase"
 
 function ProtectedRoute({ children }) {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [checking, setChecking] = useState(true)
+  const [user, setUser] = useState(null)
+  const location = useLocation()
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      setLoading(false);
-    });
+    const unsub = onAuthStateChanged(auth, (u) => {
+      setUser(u)
+      setChecking(false)
+    })
+    return () => unsub()
+  }, [])
 
-    return () => unsubscribe();
-  }, []);
-
-  if (loading) {
+  if (checking) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-50">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-indigo-600 border-t-transparent" />
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600" />
       </div>
-    );
+    )
   }
 
   if (!user) {
-    return <Navigate to="/auth" replace />;
+    return (
+      <Navigate to="/auth" state={{ from: location.pathname }} replace />
+    )
   }
 
-  return children;
+  return children
 }
 
-export default ProtectedRoute;
+export default ProtectedRoute
