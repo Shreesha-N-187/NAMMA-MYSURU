@@ -79,13 +79,26 @@ function ProductDetail() {
   };
 
   const handleBuyNow = () => {
-    if (!product) return;
+    if (!product || !auth.currentUser) return;
+    
     openRazorpay({
       amount: product.price,
-      productName: product.name,
-      artisanName: product.artisan,
+      userId: auth.currentUser.uid,
       userName: currentUser.name,
       userEmail: currentUser.email,
+      items: [
+        {
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          quantity: 1,
+          image: product.image,
+          artisan: product.artisan,
+        },
+      ],
+      onSuccess: () => {
+        navigate("/orders");
+      },
     });
   };
 

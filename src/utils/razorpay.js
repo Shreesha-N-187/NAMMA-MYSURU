@@ -1,3 +1,6 @@
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { db } from "../firebase";
+
 const RAZORPAY_SCRIPT_ID = "razorpay-checkout-js";
 
 function loadRazorpayScript() {
@@ -26,24 +29,25 @@ function loadRazorpayScript() {
 
 export async function openRazorpay({
   amount,
-  productName,
-  artisanName,
-  userName,
+  items,
+  userId,
   userEmail,
+  userName,
+  onSuccess,
 }) {
   const isLoaded = await loadRazorpayScript();
 
   if (!isLoaded || !window.Razorpay) {
-    alert("Payment cancelled or failed. Please try again.");
+    alert("Payment script failed to load. Please try again.");
     return;
   }
 
   const options = {
     key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-    amount: Math.round(Number(amount) * 100),
+    amount: Math.round(Number(amount) * 100), // Razorpay handles amounts in paise (paise = INR * 100)
     currency: "INR",
     name: "Namma Mysuru",
-    description: `${productName} by ${artisanName}`,
+    description: `Payment for ${items.length} item(s)`,
     prefill: {
       name: userName || "",
       email: userEmail || "",
@@ -51,8 +55,29 @@ export async function openRazorpay({
     theme: {
       color: "#F97316",
     },
-    handler: () => {
-      alert(`Payment Successful! 🎉 Order placed for ${productName}`);
+    handler: async function (response) {
+      try {
+        // Safe database write execution directly into the Firestore orders collection
+        await addDoc(collection(db, "orders"), {
+          userId: userId,
+          userEmail: userEmail,
+          userName: userName,
+          items: items,
+          total: Number(amount),
+          status: "Paid",
+          paymentId: response.razorpay_payment_id,
+          createdAt: serverTimestamp(),
+        });
+
+        alert("Payment Successful! 🎉 Your order has been registered.");
+        
+        if (onSuccess) {
+          onSuccess();
+        }
+      } catch (error) {
+        console.error("Firestore order registration error:", error);
+        alert("Payment succeeded, but your order tracking failed to save. Please check your Firestore rules.");
+      }
     },
     modal: {
       ondismiss: () => {

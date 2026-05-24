@@ -103,12 +103,29 @@ function CustomerHome() {
   };
 
   const handleBuyNow = (product) => {
+    if (!auth.currentUser) {
+      navigate("/auth");
+      return;
+    }
+
     openRazorpay({
       amount: product.price,
-      productName: product.name,
-      artisanName: product.artisan,
+      userId: auth.currentUser.uid,
       userName: currentUser.name,
       userEmail: currentUser.email,
+      items: [
+        {
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          quantity: 1,
+          image: product.image,
+          artisan: product.artisan,
+        },
+      ],
+      onSuccess: () => {
+        navigate("/orders");
+      },
     });
   };
 
@@ -136,6 +153,15 @@ function CustomerHome() {
             Namma Mysuru
           </h1>
           <div className="flex items-center gap-4">
+            {/* Order History Button */}
+            <button
+              type="button"
+              onClick={() => navigate("/orders")}
+              className="rounded-xl border border-orange-200 bg-white px-3 py-2 text-sm font-semibold text-orange-800 hover:bg-orange-50 transition shadow-sm flex items-center gap-1.5"
+            >
+              📜 Orders
+            </button>
+
             <button
               onClick={() => navigate("/cart")}
               className="relative rounded-full bg-orange-100 p-2 text-xl text-orange-700 hover:bg-orange-200 transition"
@@ -204,7 +230,6 @@ function CustomerHome() {
               key={product.id}
               className="overflow-hidden rounded-3xl border border-orange-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg flex flex-col justify-between"
             >
-              {/* Added back the click navigation routing to ProductDetail */}
               <div 
                 className="cursor-pointer group"
                 onClick={() => navigate(`/product/${product.id}`)}
@@ -231,7 +256,7 @@ function CustomerHome() {
                   <button
                     type="button"
                     onClick={(e) => {
-                      e.stopPropagation(); // Prevents triggering parent link navigation
+                      e.stopPropagation(); 
                       addToCart(product);
                     }}
                     className="w-full border border-orange-600 text-orange-600 hover:bg-orange-50 text-sm py-2 rounded-xl font-semibold transition"

@@ -1,3 +1,4 @@
+import OrderHistory from "./pages/OrderHistory";
 import ProductDetail from "./pages/ProductDetail";
 import ChatBot from "./components/ChatBot";
 import ItineraryBuilder from "./pages/ItineraryBuilder";
@@ -8,7 +9,7 @@ import ArtisanDashboard from "./pages/ArtisanDashboard";
 import ArtisanProfile from "./pages/ArtisanProfile";
 import Auth from "./pages/Auth";
 import CustomerHome from "./pages/CustomerHome";
-import CartPage from "./pages/CartPage"; // Added Cart Page Import
+import CartPage from "./pages/CartPage"; 
 import RoleSelect from "./pages/RoleSelect";
 import SpotDetail from "./pages/SpotDetail";
 import TouristHome from "./pages/TouristHome";
@@ -47,28 +48,26 @@ function App() {
           }
         />
         <Route
-  path="/customer-home"
-  element={
-    <ProtectedRoute>
-      <CustomerHome />
-    </ProtectedRoute>
-  }
-/>
-{/* New Product Detail Parameter Path Route Configuration */}
-<Route
-  path="/product/:id"
-  element={
-    <ProtectedRoute>
-      <ProductDetail />
-    </ProtectedRoute>
-  }
-/>
-        {/* Added Protected Cart Route */}
+          path="/product/:id"
+          element={
+            <ProtectedRoute>
+              <ProductDetail />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/cart"
           element={
             <ProtectedRoute>
               <CartPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/orders"
+          element={
+            <ProtectedRoute>
+              <OrderHistory />
             </ProtectedRoute>
           }
         />
