@@ -23,10 +23,10 @@ function CustomerHome() {
   const [firestoreProducts, setFirestoreProducts] = useState([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
   
-  // 1. Toast notification state
+  // Ephemeral toast notification state
   const [toastMessage, setToastMessage] = useState("");
 
-  // 2. Persistent LocalStorage Cart Initialization
+  // Persistent LocalStorage Cart State
   const [cart, setCart] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem("namma_cart") || "[]");
@@ -35,12 +35,12 @@ function CustomerHome() {
     }
   });
 
-  // 3. Sync Cart state to LocalStorage automatically
+  // Sync Cart state mutations directly back to local storage automatically
   useEffect(() => {
     localStorage.setItem("namma_cart", JSON.stringify(cart));
   }, [cart]);
 
-  // 4. Calculate total count for the navbar badge
+  // Dynamically sum up total quantities of all items combined for the navbar badge
   const cartCount = useMemo(() => {
     return cart.reduce((sum, item) => sum + item.quantity, 0);
   }, [cart]);
@@ -86,7 +86,6 @@ function CustomerHome() {
     return () => unsubscribe();
   }, []);
 
-  // 5. Add to Cart Handler
   const addToCart = (product) => {
     setCart((prev) => {
       const existing = prev.find((item) => item.id === product.id);
@@ -98,7 +97,7 @@ function CustomerHome() {
       return [...prev, { ...product, quantity: 1 }];
     });
 
-    // Show temporary confirmation toast
+    // Trigger toast notification
     setToastMessage(`🛒 Added "${product.name}" to cart!`);
     setTimeout(() => setToastMessage(""), 2000);
   };
@@ -121,31 +120,22 @@ function CustomerHome() {
   return (
     <main className="min-h-screen bg-gradient-to-b from-orange-50 via-amber-50 to-orange-100 relative">
       
-      {/* Dynamic Popup Toast */}
+      {/* Toast Notification Element */}
       {toastMessage && (
-        <div className="fixed bottom-5 right-5 z-50 bg-emerald-600 text-white font-semibold text-sm px-5 py-3 rounded-xl shadow-xl">
+        <div className="fixed bottom-5 right-5 z-50 bg-emerald-600 text-white font-semibold text-sm px-5 py-3 rounded-xl shadow-xl transition-all duration-300">
           {toastMessage}
         </div>
       )}
 
-      {/* Navigation Bar */}
       <nav className="sticky top-0 z-20 border-b border-orange-200/80 bg-white/90 backdrop-blur">
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-          <h1 className="text-2xl font-bold tracking-tight text-orange-900 cursor-pointer" onClick={() => navigate("/customer-home")}>
+          <h1 
+            className="text-2xl font-bold tracking-tight text-orange-900 cursor-pointer" 
+            onClick={() => navigate("/customer-home")}
+          >
             Namma Mysuru
           </h1>
-          <div className="flex items-center gap-3 sm:gap-4">
-            
-            {/* Order History Link */}
-            <button
-              onClick={() => navigate("/order-history")}
-              className="text-xs sm:text-sm font-semibold text-orange-800 hover:text-orange-950 border border-orange-200 bg-orange-50/40 px-3 py-1.5 rounded-xl transition"
-              type="button"
-            >
-              📋 My Orders
-            </button>
-
-            {/* Cart Icon with Dynamic Badge */}
+          <div className="flex items-center gap-4">
             <button
               onClick={() => navigate("/cart")}
               className="relative rounded-full bg-orange-100 p-2 text-xl text-orange-700 hover:bg-orange-200 transition"
@@ -158,7 +148,6 @@ function CustomerHome() {
                 </span>
               )}
             </button>
-            
             <button
               type="button"
               onClick={handleLogout}
@@ -170,7 +159,6 @@ function CustomerHome() {
         </div>
       </nav>
 
-      {/* Hero Banner Section */}
       <section className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="rounded-3xl bg-gradient-to-r from-orange-200 via-amber-100 to-orange-50 p-6 shadow-sm ring-1 ring-orange-200">
           <h2 className="text-3xl font-bold tracking-tight text-orange-950">
@@ -181,7 +169,6 @@ function CustomerHome() {
           </p>
         </div>
 
-        {/* Category Filters */}
         <div className="mt-6 flex flex-wrap gap-2">
           {categories.map((category) => (
             <button
@@ -199,7 +186,6 @@ function CustomerHome() {
           ))}
         </div>
 
-        {/* Product Grid Layout */}
         <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {loadingProducts && (
             <div className="col-span-full flex justify-center py-12">
@@ -216,17 +202,16 @@ function CustomerHome() {
           {!loadingProducts && filteredProducts.map((product) => (
             <article
               key={product.id}
-              onClick={() => navigate(`/product/${product.id}`)}
-              className="overflow-hidden rounded-3xl border border-orange-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg flex flex-col justify-between cursor-pointer group"
+              className="overflow-hidden rounded-3xl border border-orange-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg flex flex-col justify-between"
             >
               <div>
                 <img
                   src={product.image}
                   alt={product.name}
-                  className="aspect-square w-full object-cover group-hover:scale-[1.02] transition duration-200"
+                  className="aspect-square w-full object-cover"
                 />
                 <div className="p-5 pb-0">
-                  <h3 className="text-lg font-bold text-orange-950 group-hover:text-orange-600 transition">
+                  <h3 className="text-lg font-bold text-orange-950">
                     {product.name}
                   </h3>
                   <p className="mt-1 text-sm text-slate-500">by {product.artisan}</p>
@@ -241,10 +226,7 @@ function CustomerHome() {
                 <div className="grid grid-cols-1 gap-2 mb-2">
                   <button
                     type="button"
-                    onClick={(e) => {
-                      e.stopPropagation(); // Prevents navigating to details page
-                      addToCart(product);
-                    }}
+                    onClick={() => addToCart(product)}
                     className="w-full border border-orange-600 text-orange-600 hover:bg-orange-50 text-sm py-2 rounded-xl font-semibold transition"
                   >
                     🛒 Add to Cart
@@ -253,10 +235,7 @@ function CustomerHome() {
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
-                    onClick={(e) => {
-                      e.stopPropagation(); // Prevents navigating to details page
-                      handleBuyNow(product);
-                    }}
+                    onClick={() => handleBuyNow(product)}
                     className="rounded-xl bg-orange-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-orange-700"
                   >
                     Buy Now
@@ -268,7 +247,6 @@ function CustomerHome() {
                     )}`}
                     target="_blank"
                     rel="noreferrer"
-                    onClick={(e) => e.stopPropagation()} // Prevents navigating to details page
                     className="rounded-xl bg-emerald-600 px-3 py-2 text-center text-sm font-semibold text-white transition hover:bg-emerald-700"
                   >
                     WhatsApp
