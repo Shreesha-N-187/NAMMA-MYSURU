@@ -1,3 +1,4 @@
+import ProductDetail from "./pages/ProductDetail";
 import ChatBot from "./components/ChatBot";
 import ItineraryBuilder from "./pages/ItineraryBuilder";
 import AdminPanel from "./pages/AdminPanel";
@@ -45,6 +46,23 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+  path="/customer-home"
+  element={
+    <ProtectedRoute>
+      <CustomerHome />
+    </ProtectedRoute>
+  }
+/>
+{/* New Product Detail Parameter Path Route Configuration */}
+<Route
+  path="/product/:id"
+  element={
+    <ProtectedRoute>
+      <ProductDetail />
+    </ProtectedRoute>
+  }
+/>
         {/* Added Protected Cart Route */}
         <Route
           path="/cart"
