@@ -204,14 +204,18 @@ function CustomerHome() {
               key={product.id}
               className="overflow-hidden rounded-3xl border border-orange-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg flex flex-col justify-between"
             >
-              <div>
+              {/* Added back the click navigation routing to ProductDetail */}
+              <div 
+                className="cursor-pointer group"
+                onClick={() => navigate(`/product/${product.id}`)}
+              >
                 <img
                   src={product.image}
                   alt={product.name}
-                  className="aspect-square w-full object-cover"
+                  className="aspect-square w-full object-cover group-hover:opacity-90 transition"
                 />
                 <div className="p-5 pb-0">
-                  <h3 className="text-lg font-bold text-orange-950">
+                  <h3 className="text-lg font-bold text-orange-950 group-hover:text-orange-700 transition">
                     {product.name}
                   </h3>
                   <p className="mt-1 text-sm text-slate-500">by {product.artisan}</p>
@@ -226,7 +230,10 @@ function CustomerHome() {
                 <div className="grid grid-cols-1 gap-2 mb-2">
                   <button
                     type="button"
-                    onClick={() => addToCart(product)}
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevents triggering parent link navigation
+                      addToCart(product);
+                    }}
                     className="w-full border border-orange-600 text-orange-600 hover:bg-orange-50 text-sm py-2 rounded-xl font-semibold transition"
                   >
                     🛒 Add to Cart
@@ -235,7 +242,10 @@ function CustomerHome() {
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
-                    onClick={() => handleBuyNow(product)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleBuyNow(product);
+                    }}
                     className="rounded-xl bg-orange-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-orange-700"
                   >
                     Buy Now
@@ -247,6 +257,7 @@ function CustomerHome() {
                     )}`}
                     target="_blank"
                     rel="noreferrer"
+                    onClick={(e) => e.stopPropagation()}
                     className="rounded-xl bg-emerald-600 px-3 py-2 text-center text-sm font-semibold text-white transition hover:bg-emerald-700"
                   >
                     WhatsApp
