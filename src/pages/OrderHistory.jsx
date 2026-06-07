@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { collection, query, where, orderBy, getDocs } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "../firebase";
+import BackButton from "../components/BackButton";
 
 function OrderHistory() {
   const navigate = useNavigate();
@@ -49,16 +50,14 @@ function OrderHistory() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-orange-50 via-amber-50 to-orange-100 py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto">
-        
-        <button
-          onClick={() => navigate("/customer-home")}
-          className="mb-6 flex items-center gap-2 text-sm font-semibold text-orange-800 hover:text-orange-950 transition"
-        >
-          ← Back to Shop
-        </button>
+    <main className="min-h-screen bg-gradient-to-b from-orange-50 via-amber-50 to-orange-100 pb-8">
 
+      {/* Back Button Bar */}
+      <div className="bg-white border-b border-gray-100 px-4 py-2.5 flex items-center">
+        <BackButton to="/customer-home" label="Back to shop" />
+      </div>
+
+      <div className="max-w-4xl mx-auto px-4 pt-8 sm:px-6 lg:px-8">
         <h1 className="text-3xl font-bold tracking-tight text-orange-950 mb-2">
           Your Order History
         </h1>
@@ -84,7 +83,6 @@ function OrderHistory() {
                 key={order.id}
                 className="bg-white rounded-3xl border border-orange-200/60 shadow-sm overflow-hidden"
               >
-                {/* Order Meta Header */}
                 <div className="bg-orange-50/60 px-6 py-4 border-b border-orange-100 flex flex-wrap items-center justify-between gap-4">
                   <div>
                     <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Order ID</p>
@@ -114,7 +112,6 @@ function OrderHistory() {
                   </div>
                 </div>
 
-                {/* Items List */}
                 <div className="divide-y divide-orange-100 px-6">
                   {order.items?.map((item, index) => (
                     <div key={item.id || index} className="py-4 flex items-center justify-between gap-4">
