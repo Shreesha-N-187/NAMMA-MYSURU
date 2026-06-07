@@ -22,11 +22,9 @@ function CustomerHome() {
   const [currentUser, setCurrentUser] = useState({ name: "", email: "" });
   const [firestoreProducts, setFirestoreProducts] = useState([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
-  
-  // Ephemeral toast notification state
   const [toastMessage, setToastMessage] = useState("");
+  const [scrolled, setScrolled] = useState(false);
 
-  // Persistent LocalStorage Cart State
   const [cart, setCart] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem("namma_cart") || "[]");
@@ -35,12 +33,16 @@ function CustomerHome() {
     }
   });
 
-  // Sync Cart state mutations directly back to local storage automatically
   useEffect(() => {
     localStorage.setItem("namma_cart", JSON.stringify(cart));
   }, [cart]);
 
-  // Dynamically sum up total quantities of all items combined for the navbar badge
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   const cartCount = useMemo(() => {
     return cart.reduce((sum, item) => sum + item.quantity, 0);
   }, [cart]);
@@ -96,8 +98,6 @@ function CustomerHome() {
       }
       return [...prev, { ...product, quantity: 1 }];
     });
-
-    // Trigger toast notification
     setToastMessage(`🛒 Added "${product.name}" to cart!`);
     setTimeout(() => setToastMessage(""), 2000);
   };
@@ -107,7 +107,6 @@ function CustomerHome() {
       navigate("/auth");
       return;
     }
-
     openRazorpay({
       amount: product.price,
       userId: auth.currentUser.uid,
@@ -123,9 +122,7 @@ function CustomerHome() {
           artisan: product.artisan,
         },
       ],
-      onSuccess: () => {
-        navigate("/orders");
-      },
+      onSuccess: () => navigate("/orders"),
     });
   };
 
@@ -135,49 +132,56 @@ function CustomerHome() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-orange-50 via-amber-50 to-orange-100 relative">
-      
-      {/* Toast Notification Element */}
+    <div className="min-h-screen bg-gray-50">
+
+      {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-5 right-5 z-50 bg-emerald-600 text-white font-semibold text-sm px-5 py-3 rounded-xl shadow-xl transition-all duration-300">
+        <div className="fixed bottom-5 right-5 z-50 bg-green-600 text-white
+                        font-semibold text-sm px-5 py-3 rounded-lg shadow-xl
+                        transition-all duration-300">
           {toastMessage}
         </div>
       )}
 
-      <nav className="sticky top-0 z-20 border-b border-orange-200/80 bg-white/90 backdrop-blur">
-        <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-          <h1 
-            className="text-2xl font-bold tracking-tight text-orange-900 cursor-pointer" 
+      {/* Navbar */}
+      <nav className={`bg-white sticky top-0 z-40 transition-shadow duration-200
+                      ${scrolled ? "shadow-md border-b border-gray-200" : "border-b border-gray-100"}`}>
+        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+          <span
+            className="text-lg font-bold text-blue-600 tracking-tight cursor-pointer"
             onClick={() => navigate("/customer-home")}
           >
             Namma Mysuru
-          </h1>
-          <div className="flex items-center gap-4">
-            {/* Order History Button */}
+          </span>
+          <div className="flex items-center gap-3">
             <button
-              type="button"
               onClick={() => navigate("/orders")}
-              className="rounded-xl border border-orange-200 bg-white px-3 py-2 text-sm font-semibold text-orange-800 hover:bg-orange-50 transition shadow-sm flex items-center gap-1.5"
+              className="hidden sm:block text-xs text-gray-600 hover:text-blue-600
+                         transition-colors active:scale-95"
             >
-              📜 Orders
+              📦 My Orders
             </button>
-
-            <button
-              onClick={() => navigate("/cart")}
-              className="relative rounded-full bg-orange-100 p-2 text-xl text-orange-700 hover:bg-orange-200 transition"
-              type="button"
-            >
-              🛒
+            <div className="relative">
+              <button
+                onClick={() => navigate("/cart")}
+                className="text-gray-600 hover:text-blue-600 text-xl transition-colors active:scale-95"
+              >
+                🛒
+              </button>
               {cartCount > 0 && (
-                <span className="absolute -right-1 -top-1 rounded-full bg-orange-600 px-1.5 py-0.5 text-xs font-semibold text-white min-w-5 text-center">
+                <span className="absolute -top-1 -right-1 bg-blue-600 text-white
+                                 text-xs w-4 h-4 rounded-full flex items-center
+                                 justify-center font-semibold leading-none">
                   {cartCount}
                 </span>
               )}
-            </button>
+            </div>
+            <span className="hidden sm:block text-xs text-gray-500">
+              Hi, {currentUser.name}
+            </span>
             <button
-              type="button"
               onClick={handleLogout}
-              className="rounded-xl bg-orange-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-orange-700"
+              className="text-xs text-gray-500 hover:text-red-600 transition-colors active:scale-95"
             >
               Logout
             </button>
@@ -185,97 +189,103 @@ function CustomerHome() {
         </div>
       </nav>
 
-      <section className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="rounded-3xl bg-gradient-to-r from-orange-200 via-amber-100 to-orange-50 p-6 shadow-sm ring-1 ring-orange-200">
-          <h2 className="text-3xl font-bold tracking-tight text-orange-950">
-            Shop Authentic Mysuru Crafts
-          </h2>
-          <p className="mt-2 text-sm text-orange-900/90 sm:text-base">
-            Buy directly from verified local artisans — no middlemen
-          </p>
-        </div>
+      {/* Hero */}
+      <div className="bg-blue-600 py-12 px-6 text-center">
+        <h1 className="text-3xl font-bold text-white tracking-tight">
+          Shop Authentic Mysuru Crafts
+        </h1>
+        <p className="text-blue-200 text-sm mt-2">
+          Direct from verified local artisans — no middlemen
+        </p>
+      </div>
 
-        <div className="mt-6 flex flex-wrap gap-2">
-          {categories.map((category) => (
-            <button
-              key={category}
-              type="button"
-              onClick={() => setActiveCategory(category)}
-              className={`rounded-full border px-4 py-1.5 text-sm font-medium transition ${
-                activeCategory === category
-                  ? "border-orange-700 bg-orange-600 text-white"
-                  : "border-orange-200 bg-white text-orange-800 hover:bg-orange-100"
+      {/* Category Filters */}
+      <div className="flex gap-2 overflow-x-auto px-4 mt-4 pb-1 max-w-6xl mx-auto">
+        {categories.map((category) => (
+          <button
+            key={category}
+            onClick={() => setActiveCategory(category)}
+            className={`flex-shrink-0 text-xs px-4 py-1.5 rounded-md font-medium
+                        transition-colors active:scale-95
+              ${activeCategory === category
+                ? "bg-blue-600 text-white"
+                : "bg-white border border-gray-200 text-gray-600 hover:border-blue-300"
               }`}
-            >
-              {category}
-            </button>
+          >
+            {category}
+          </button>
+        ))}
+      </div>
+
+      {/* Products */}
+      {loadingProducts ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 px-4 mt-6 max-w-6xl mx-auto">
+          {[1, 2].map((i) => (
+            <div key={i} className="bg-white rounded-lg border border-gray-200
+                                    overflow-hidden animate-pulse">
+              <div className="w-full aspect-square bg-gray-200" />
+              <div className="p-4 space-y-2">
+                <div className="h-3 bg-gray-200 rounded w-1/3" />
+                <div className="h-4 bg-gray-200 rounded w-3/4" />
+                <div className="h-5 bg-gray-200 rounded w-1/4" />
+              </div>
+            </div>
           ))}
         </div>
-
-        <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {loadingProducts && (
-            <div className="col-span-full flex justify-center py-12">
-              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-orange-600" />
-            </div>
-          )}
-
-          {!loadingProducts && filteredProducts.length === 0 && (
-            <div className="col-span-full text-center py-12 text-slate-400">
-              No products found.
-            </div>
-          )}
-
-          {!loadingProducts && filteredProducts.map((product) => (
-            <article
+      ) : filteredProducts.length === 0 ? (
+        <div className="text-center py-16 text-gray-400 text-sm">
+          No products found.
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 px-4 mt-6
+                        max-w-6xl mx-auto pb-10">
+          {filteredProducts.map((product) => (
+            <div
               key={product.id}
-              className="overflow-hidden rounded-3xl border border-orange-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg flex flex-col justify-between"
+              className="bg-white rounded-lg border border-gray-200 shadow-sm
+                         hover:shadow-md hover:-translate-y-0.5 transition-all
+                         duration-200 overflow-hidden will-change-transform"
             >
-              <div 
-                className="cursor-pointer group"
-                onClick={() => navigate(`/product/${product.id}`)}
-              >
+              <div className="relative">
                 <img
                   src={product.image}
                   alt={product.name}
-                  className="aspect-square w-full object-cover group-hover:opacity-90 transition"
+                  className="w-full aspect-square object-cover cursor-pointer"
+                  onClick={() => navigate(`/product/${product.id}`)}
                 />
-                <div className="p-5 pb-0">
-                  <h3 className="text-lg font-bold text-orange-950 group-hover:text-orange-700 transition">
-                    {product.name}
-                  </h3>
-                  <p className="mt-1 text-sm text-slate-500">by {product.artisan}</p>
-                  <p className="mt-2 text-lg font-bold text-orange-700">₹{product.price}</p>
-                  <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-slate-700">
-                    {product.description}
-                  </p>
-                </div>
+                <span className="absolute top-2 right-2 bg-green-500 text-white
+                                 text-xs px-2 py-0.5 rounded-md">
+                  🟢 Live
+                </span>
               </div>
-              
-              <div className="p-5 pt-4">
-                <div className="grid grid-cols-1 gap-2 mb-2">
+              <div className="p-4">
+                <p className="text-xs text-gray-500 mb-1">by {product.artisan}</p>
+                <p
+                  className="text-sm font-semibold text-gray-900 cursor-pointer
+                             hover:text-blue-600 transition-colors"
+                  onClick={() => navigate(`/product/${product.id}`)}
+                >
+                  {product.name}
+                </p>
+                <p className="text-xl font-bold text-blue-600 mt-1">₹{product.price}</p>
+                <p className="text-xs text-gray-500 line-clamp-2 mt-1">
+                  {product.description}
+                </p>
+                <div className="flex gap-2 mt-3">
                   <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation(); 
-                      addToCart(product);
-                    }}
-                    className="w-full border border-orange-600 text-orange-600 hover:bg-orange-50 text-sm py-2 rounded-xl font-semibold transition"
+                    onClick={(e) => { e.stopPropagation(); addToCart(product); }}
+                    className="text-xs border border-gray-300 rounded-md px-3 py-1.5
+                               text-gray-700 hover:bg-gray-50 transition-colors active:scale-95"
                   >
-                    🛒 Add to Cart
+                    🛒 Cart
                   </button>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
                   <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleBuyNow(product);
-                    }}
-                    className="rounded-xl bg-orange-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-orange-700"
+                    onClick={(e) => { e.stopPropagation(); handleBuyNow(product); }}
+                    className="text-xs bg-blue-600 text-white rounded-md px-3 py-1.5
+                               font-medium hover:bg-blue-700 transition-colors active:scale-95"
                   >
                     Buy Now
                   </button>
-
                   <a
                     href={`https://wa.me/${product.whatsapp}?text=${encodeURIComponent(
                       `Hi, I found your product on Namma Mysuru! I'm interested in ${product.name}`
@@ -283,17 +293,18 @@ function CustomerHome() {
                     target="_blank"
                     rel="noreferrer"
                     onClick={(e) => e.stopPropagation()}
-                    className="rounded-xl bg-emerald-600 px-3 py-2 text-center text-sm font-semibold text-white transition hover:bg-emerald-700"
+                    className="text-xs bg-green-500 text-white rounded-md px-3 py-1.5
+                               active:scale-95 flex items-center"
                   >
-                    WhatsApp
+                    💬
                   </a>
                 </div>
               </div>
-            </article>
+            </div>
           ))}
         </div>
-      </section>
-    </main>
+      )}
+    </div>
   );
 }
 
