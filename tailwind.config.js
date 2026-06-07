@@ -3,11 +3,8 @@ export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
-      colors: {
-        accent: "var(--accent)",
-        'accent-bg': "var(--accent-bg)",
-        'social-bg': "var(--social-bg)",
-        'code-bg': "var(--code-bg)",
+      fontFamily: {
+        sans: ["Inter", "system-ui", "sans-serif"],
       },
     },
   },
