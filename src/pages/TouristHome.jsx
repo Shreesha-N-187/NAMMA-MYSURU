@@ -6,33 +6,36 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth, db } from "../firebase";
 
-const categoryStyles = {
-  Food: "bg-orange-100 text-orange-800 border-orange-200",
-  Homestay: "bg-emerald-100 text-emerald-800 border-emerald-200",
-  Experience: "bg-amber-100 text-amber-800 border-amber-200",
-};
-
 function TouristHome() {
   const navigate = useNavigate();
   const [username, setUsername] = useState("Guest");
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
-  const [wishlist, setWishlist] = useState([]);
-  const [spotsData, setSpotsData] = useState([])
-  const [loadingSpots, setLoadingSpots] = useState(true)
+  const [spotsData, setSpotsData] = useState([]);
+  const [loadingSpots, setLoadingSpots] = useState(true);
+
+  const [wishlist, setWishlist] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("namma_wishlist") || "[]");
+    } catch { return []; }
+  });
+
+  const [scrolled, setScrolled] = useState(false);
+
+  const toggleWishlist = (spotId) => {
+    setWishlist(prev => {
+      const updated = prev.includes(spotId)
+        ? prev.filter(id => id !== spotId)
+        : [...prev, spotId];
+      localStorage.setItem("namma_wishlist", JSON.stringify(updated));
+      return updated;
+    });
+  };
 
   useEffect(() => {
-    const savedWishlist = localStorage.getItem("wishlist");
-    if (savedWishlist) {
-      try {
-        const parsed = JSON.parse(savedWishlist);
-        if (Array.isArray(parsed)) {
-          setWishlist(parsed);
-        }
-      } catch {
-        setWishlist([]);
-      }
-    }
+    const handleScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   useEffect(() => {
@@ -44,32 +47,30 @@ function TouristHome() {
         const data = userSnap.data();
         setUsername(data.name || "Traveler");
       }
-    }
-  fetchUser();
-}, []);
+    };
+    fetchUser();
+  }, []);
 
-    useEffect(() => {
-  async function fetchSpots() {
-    try {
-      const snapshot = await getDocs(collection(db, "spots"))
-      const data = snapshot.docs.map(d => ({ id: d.id, ...d.data() }))
-      setSpotsData(data)
-    } catch (error) {
-      const { default: fallback } = await import("../data/spots")
-      setSpotsData(fallback)
-    } finally {
-      setLoadingSpots(false)
+  useEffect(() => {
+    async function fetchSpots() {
+      try {
+        const snapshot = await getDocs(collection(db, "spots"));
+        const data = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        setSpotsData(data);
+      } catch (error) {
+        const { spotsData: fallback } = await import("../data/spots");
+        setSpotsData(fallback);
+      } finally {
+        setLoadingSpots(false);
+      }
     }
-  }
-  fetchSpots()
-}, [])
-
+    fetchSpots();
+  }, []);
 
   const filteredSpots = useMemo(() => {
     const query = search.trim().toLowerCase();
     return spotsData.filter((spot) => {
-      const matchesCategory =
-        activeCategory === "All" ? true : spot.category === activeCategory;
+      const matchesCategory = activeCategory === "All" ? true : spot.category === activeCategory;
       const matchesSearch =
         query.length === 0 ||
         spot.name.toLowerCase().includes(query) ||
@@ -78,196 +79,181 @@ function TouristHome() {
     });
   }, [search, activeCategory, spotsData]);
 
-  const toggleWishlist = (spotId) => {
-    const next = wishlist.includes(spotId)
-      ? wishlist.filter((id) => id !== spotId)
-      : [...wishlist, spotId];
-    setWishlist(next);
-    localStorage.setItem("wishlist", JSON.stringify(next));
-  };
-
   const handleLogout = async () => {
     await signOut(auth);
     localStorage.clear();
     navigate("/");
   };
 
-  const renderStars = (rating) => {
-    const fullStars = Math.round(rating);
-    return (
-      <div className="flex items-center gap-1">
-        {[...Array(5)].map((_, idx) => (
-          <span
-            key={`${rating}-${idx}`}
-            className={idx < fullStars ? "text-amber-500" : "text-amber-200"}
-          >
-            ★
-          </span>
-        ))}
-      </div>
-    );
-  };
+  return (
+    <div className="min-h-screen bg-gray-50">
 
-  if (loadingSpots) {
-  return (
-    <div className="flex items-center justify-center h-64">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600" />
-    </div>
-  )
-}
-  return (
-    <main className="min-h-screen bg-gradient-to-b from-amber-50 via-orange-50 to-emerald-50">
-      <nav className="sticky top-0 z-20 border-b border-orange-200/70 bg-white/80 backdrop-blur">
-        <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-          <h1 className="text-2xl font-bold tracking-tight text-orange-900">
-            Namma Mysuru
-          </h1>
-          <div className="flex items-center gap-3 sm:gap-5">
-            <p className="hidden text-sm font-medium text-emerald-900 sm:block">
-              Hi, {username}
-            </p>
+      {/* NAVBAR */}
+      <nav className={`bg-white sticky top-0 z-40 transition-shadow duration-200
+                      ${scrolled ? "shadow-md border-b border-gray-200" : "border-b border-gray-100"}`}>
+        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+          <span className="text-lg font-bold text-blue-600 tracking-tight">Namma Mysuru</span>
+          <div className="flex items-center gap-3">
             <button
-  onClick={() => navigate("/itinerary")}
-  className="text-sm font-medium text-orange-600 hover:text-orange-700 border border-orange-300 rounded-full px-3 py-1"
->
-  🗓️ Plan My Day
-</button>
-            <button
-              type="button"
-              className="relative rounded-full bg-orange-100 px-3 py-1.5 text-lg text-orange-700"
-              aria-label="Wishlist"
-            >
-              ❤️
-              <span className="absolute -right-2 -top-2 rounded-full bg-emerald-600 px-1.5 text-xs font-semibold text-white">
-                {wishlist.length}
-              </span>
+              onClick={() => navigate("/itinerary")}
+              className="hidden sm:block text-xs text-gray-600 hover:text-blue-600
+                         border border-gray-200 rounded-md px-3 py-1.5 transition-colors">
+              Plan My Day
             </button>
+            <div className="relative">
+              <button className="text-gray-600 hover:text-blue-600 text-xl transition-colors">
+                {wishlist.length > 0 ? "❤️" : "🤍"}
+              </button>
+              {wishlist.length > 0 && (
+                <span className="absolute -top-1 -right-1 bg-blue-600 text-white
+                                 text-xs w-4 h-4 rounded-full flex items-center justify-center
+                                 font-semibold leading-none">
+                  {wishlist.length}
+                </span>
+              )}
+            </div>
+            <span className="hidden sm:block text-xs text-gray-500">Hi, {username}</span>
             <button
-              type="button"
               onClick={handleLogout}
-              className="rounded-xl bg-orange-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-orange-700"
-            >
+              className="text-xs text-gray-500 hover:text-red-600 transition-colors">
               Logout
             </button>
           </div>
         </div>
       </nav>
 
-      <section className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="mb-6 rounded-3xl border border-orange-200 bg-white/90 p-5 shadow-sm">
-          <h2 className="text-2xl font-bold text-orange-950">
-            Hidden Gems of Mysuru
-          </h2>
-          <p className="mt-1 text-sm text-orange-900/80">
-            Discover curated local places verified by our team
-          </p>
-          <EventsBanner />
+      {/* HERO */}
+      <div className="bg-blue-600 py-12 px-6 text-center">
+        <h1 className="text-3xl font-bold text-white tracking-tight">
+          Discover Hidden Mysuru
+        </h1>
+        <p className="text-blue-200 text-sm mt-2 max-w-sm mx-auto">
+           Team-verified spots away from the tourist crowds
+        </p>
+      </div>
 
-          <div className="mt-4">
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by spot name or location..."
-              className="w-full rounded-xl border border-orange-200 bg-orange-50 px-4 py-2.5 text-sm text-slate-900 outline-none ring-orange-200 transition placeholder:text-orange-700/60 focus:border-orange-400 focus:ring-2"
-            />
-          </div>
+      {/* SEARCH BAR */}
+      <div className="max-w-6xl mx-auto px-4 -mt-5 relative z-10">
+        <input
+          type="text"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder="Search spots or locations..."
+          className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3
+                     text-sm text-gray-900 placeholder-gray-400 shadow-md outline-none
+                     focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+        />
+      </div>
 
-          <div className="mt-4 flex flex-wrap gap-2">
-            {["All", "Food", "Homestay", "Experience"].map((category) => (
-              <button
-                key={category}
-                type="button"
-                onClick={() => setActiveCategory(category)}
-                className={`rounded-full border px-4 py-1.5 text-sm font-medium transition ${
-                  activeCategory === category
-                    ? "border-orange-700 bg-orange-600 text-white"
-                    : "border-orange-200 bg-white text-orange-800 hover:bg-orange-100"
-                }`}
-              >
-                {category}
-              </button>
-            ))}
-          </div>
-        </div>
+      {/* NEARBY SPOTS */}
+      <div className="max-w-6xl mx-auto px-4 mt-6">
         <NearbySpots spots={spotsData} />
+      </div>
 
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
-          {filteredSpots.map((spot) => (
-            <article
+      {/* EVENTS BANNER */}
+      <div className="max-w-6xl mx-auto px-4">
+        <EventsBanner />
+      </div>
+
+      {/* FILTER BUTTONS */}
+      <div className="max-w-6xl mx-auto px-4 mt-5 flex flex-wrap gap-2">
+        {["All", "Food", "Homestay", "Experience"].map(filter => (
+          <button
+            key={filter}
+            onClick={() => setActiveCategory(filter)}
+            className={`px-4 py-1.5 rounded-full text-xs font-medium border transition-colors
+              ${activeCategory === filter
+                ? "bg-blue-600 text-white border-blue-600"
+                : "bg-white text-gray-600 border-gray-300 hover:border-blue-400 hover:text-blue-600"
+              }`}
+          >
+            {filter}
+          </button>
+        ))}
+      </div>
+
+      {/* SPOTS GRID */}
+      {loadingSpots ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 px-4 mt-6 max-w-6xl mx-auto">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="bg-white rounded-lg border border-gray-200 overflow-hidden animate-pulse">
+              <div className="w-full h-48 bg-gray-200" />
+              <div className="p-4 space-y-2">
+                <div className="h-4 bg-gray-200 rounded w-3/4" />
+                <div className="h-3 bg-gray-200 rounded w-1/2" />
+                <div className="h-3 bg-gray-200 rounded w-1/3" />
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="max-w-6xl mx-auto px-4 mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {filteredSpots.map(spot => (
+            <div
               key={spot.id}
-              className="overflow-hidden rounded-3xl border border-orange-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
+              className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden
+                         hover:shadow-md hover:-translate-y-0.5 transition-all duration-200
+                         will-change-transform cursor-pointer"
+              onClick={() => navigate("/spot/" + spot.id)}
             >
               <div className="relative">
                 <img
                   src={spot.image}
                   alt={spot.name}
-                  className="h-48 w-full object-cover"
+                  className="w-full h-48 object-cover"
                 />
                 <button
-                  type="button"
-                  onClick={() => toggleWishlist(spot.id)}
-                  className="absolute right-3 top-3 rounded-full bg-white/90 px-2.5 py-1.5 text-lg shadow"
-                  aria-label="Toggle wishlist"
+                  onClick={e => { e.stopPropagation(); toggleWishlist(spot.id); }}
+                  className="absolute top-3 right-3 w-8 h-8 bg-white/90 rounded-full
+                             flex items-center justify-center shadow-sm
+                             hover:bg-white transition-colors active:scale-95"
                 >
                   {wishlist.includes(spot.id) ? "❤️" : "🤍"}
                 </button>
-              </div>
-
-              <div className="p-5">
                 {spot.teamVerified && (
-                  <span className="mb-3 inline-block rounded-full border border-emerald-200 bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">
-                    ✓ Verified by our team
+                  <span className="absolute top-3 left-3 bg-white text-green-600 text-xs
+                                   font-semibold px-2 py-0.5 rounded-md border border-green-200">
+                    ✓ Verified
                   </span>
                 )}
+              </div>
 
-                <div className="mb-3">
-                  <span
-                    className={`inline-block rounded-full border px-2.5 py-1 text-xs font-semibold ${
-                      categoryStyles[spot.category]
-                    }`}
-                  >
-                    {spot.category}
-                  </span>
+              <div className="p-4">
+                <span className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-md font-medium">
+                  {spot.category}
+                </span>
+                <h3 className="text-base font-semibold text-gray-900 mt-2">{spot.name}</h3>
+                <p className="text-xs text-gray-500 mt-0.5">📍 {spot.location}</p>
+                <div className="flex items-center gap-1 mt-2">
+                  <span className="text-amber-500 text-sm">★</span>
+                  <span className="text-sm font-medium text-gray-900">{spot.rating}</span>
+                  <span className="text-xs text-gray-400">({spot.reviewCount || "12"} reviews)</span>
                 </div>
-
-                <h3 className="text-xl font-bold text-orange-950">{spot.name}</h3>
-                <p className="mt-1 text-sm text-orange-900/80">📍 {spot.location}</p>
-
-                <div className="mt-2 flex items-center gap-2 text-sm">
-                  {renderStars(spot.rating)}
-                  <span className="font-semibold text-amber-700">{spot.rating}</span>
-                  <span className="text-slate-500">({spot.reviewCount})</span>
-                </div>
-
-                <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-slate-700">
-                  {spot.description}
-                </p>
-
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {spot.tags.map((tag) => (
-                    <span
-                      key={`${spot.id}-${tag}`}
-                      className="rounded-full bg-orange-50 px-2.5 py-1 text-xs font-medium text-orange-700"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-
+                {spot.tags && (
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {spot.tags.slice(0, 3).map(tag => (
+                      <span key={tag}
+                        className="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded-md">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
                 <button
-                  type="button"
-                  onClick={() => navigate(`/spot/${spot.id}`)}
-                  className="mt-5 text-sm font-semibold text-emerald-700 transition hover:text-emerald-800"
+                  onClick={e => { e.stopPropagation(); navigate("/spot/" + spot.id); }}
+                  className="mt-3 w-full text-center text-xs font-semibold text-blue-600
+                             hover:text-blue-700 py-2 border border-blue-200 rounded-md
+                             hover:bg-blue-50 transition-colors"
                 >
                   View Details →
                 </button>
               </div>
-            </article>
+            </div>
           ))}
         </div>
-      </section>
-    </main>
+      )}
+
+    </div>
   );
 }
 
