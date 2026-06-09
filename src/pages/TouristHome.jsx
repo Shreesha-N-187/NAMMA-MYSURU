@@ -6,6 +6,10 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth, db } from "../firebase";
 
+// NEW ADVENT ADVENTURES — SEAMLESS GAMIFICATION INTEGRATIONS
+import { useNearbySpot } from "../hooks/useNearbySpot";
+import SpotCharacter from "../components/SpotCharacter";
+
 function TouristHome() {
   const navigate = useNavigate();
   const [username, setUsername] = useState("Guest");
@@ -13,6 +17,11 @@ function TouristHome() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [spotsData, setSpotsData] = useState([]);
   const [loadingSpots, setLoadingSpots] = useState(true);
+
+  // NEW GAMIFICATION STATES — REAL-TIME TRACKING VS MANUAL PRESENTATION OVERRIDES
+  const { nearbySpot } = useNearbySpot();
+  const [demoSpot, setDemoSpot] = useState(null);
+  const [showDemo, setShowDemo] = useState(false);
 
   const [wishlist, setWishlist] = useState(() => {
     try {
@@ -172,6 +181,63 @@ function TouristHome() {
         ))}
       </div>
 
+      {/* PRESENTATION OVERRIDE MANAGEMENT PANEL — BATCH 5 PITCH COMPONENT */}
+      <div className="max-w-6xl mx-auto px-4 mt-3">
+        <button
+          onClick={() => setShowDemo(prev => !prev)}
+          className="w-full border border-blue-200 text-blue-600 rounded-md py-2
+                     text-sm font-medium hover:bg-blue-50 transition-colors active:scale-95"
+        >
+          {showDemo ? "🔒 Hide Pitch Controls" : "🎮 Open Live Presentation Matrix"}
+        </button>
+      </div>
+
+      {showDemo && (
+        <div className="max-w-6xl mx-auto px-4 mt-3">
+          <div className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-sm font-semibold text-gray-900 flex items-center gap-1.5">
+                <span className="flex h-2 w-2 relative">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-600"></span>
+                </span>
+                Live Demo Overrides (Batch 5 Pitch Menu)
+              </p>
+              <button
+                onClick={() => { setShowDemo(false); setDemoSpot(null); }}
+                className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                ✕ Close Panel
+              </button>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {[
+                { id: "hasiru-mane", label: "🏠 Hasiru (Homestay)" },
+                { id: "loco-chocolates", label: "🍫 Cocoa (Food)" },
+                { id: "jin-min-cat", label: "🐱 Jin (Experience)" },
+                { id: "uchiha-cafe", label: "⚔️ Kai (Food)" },
+                { id: "mr-co-cane", label: "🎩 Mr. Cane (Food)" },
+              ].map(char => (
+                <button
+                  key={char.id}
+                  onClick={() => setDemoSpot(demoSpot === char.id ? null : char.id)}
+                  className={`px-3 py-1.5 rounded-md text-xs font-medium border transition-all active:scale-95
+                    ${demoSpot === char.id
+                      ? "bg-blue-600 text-white border-blue-600 shadow-sm"
+                      : "bg-white text-gray-600 border-gray-300 hover:border-blue-400"
+                    }`}
+                >
+                  {char.label}
+                </button>
+              ))}
+            </div>
+            <p className="text-[11px] text-gray-400 mt-2.5 italic">
+              *Bypassing geographic fences. Selecting a destination above immediately summons its specific 3D companion asset within the UI layout container.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* SPOTS GRID */}
       {loadingSpots ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 px-4 mt-6 max-w-6xl mx-auto">
@@ -252,6 +318,9 @@ function TouristHome() {
           ))}
         </div>
       )}
+
+      {/* FIXED FLOATING 3D VIEWPORT RENDERER LAYER */}
+      {(nearbySpot || demoSpot) && <SpotCharacter spotId={demoSpot || nearbySpot} />}
 
     </div>
   );
