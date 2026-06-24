@@ -13,6 +13,7 @@ import CartPage from "./pages/CartPage";
 import RoleSelect from "./pages/RoleSelect";
 import SpotDetail from "./pages/SpotDetail";
 import TouristHome from "./pages/TouristHome";
+import SpotCharacter from './components/SpotCharacter';
 
 function App() {
   return (
