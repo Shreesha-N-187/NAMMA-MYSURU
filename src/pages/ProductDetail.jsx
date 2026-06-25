@@ -104,20 +104,20 @@ function ProductDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-amber-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600" />
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
       </div>
     );
   }
 
   if (!product) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-amber-50 p-4">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-4">
         <span className="text-5xl mb-2">🔍</span>
-        <h2 className="text-xl font-bold text-orange-950">Product Not Found</h2>
+        <h2 className="text-xl font-bold text-gray-900">Product Not Found</h2>
         <button
           onClick={() => navigate("/customer-home")}
-          className="mt-4 bg-orange-600 text-white font-semibold px-5 py-2 rounded-xl text-sm shadow hover:bg-orange-700 transition"
+          className="mt-4 bg-blue-600 text-white font-semibold px-5 py-2 rounded-md text-sm shadow hover:bg-blue-700 transition active:scale-95"
         >
           Return to Shop
         </button>
@@ -126,26 +126,26 @@ function ProductDetail() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-orange-50 via-amber-50 to-orange-100 pb-12">
+    <main className="min-h-screen bg-gray-50 pb-12">
       {/* Ephemeral Toast Alert */}
       {toastMessage && (
-        <div className="fixed bottom-5 right-5 z-50 bg-emerald-600 text-white font-semibold text-sm px-5 py-3 rounded-xl shadow-xl">
+        <div className="fixed bottom-5 right-5 z-50 bg-green-600 text-white font-semibold text-sm px-5 py-3 rounded-md shadow-xl">
           {toastMessage}
         </div>
       )}
 
       {/* Navigation Top Header Bar */}
-      <nav className="sticky top-0 z-20 border-b border-orange-200/80 bg-white/90 backdrop-blur">
+      <nav className="sticky top-0 z-40 border-b border-gray-200 bg-white">
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
           <button
             onClick={() => navigate("/customer-home")}
-            className="text-sm font-semibold text-orange-700 hover:text-orange-900 transition flex items-center gap-1"
+            className="text-sm font-semibold text-gray-600 hover:text-blue-600 transition flex items-center gap-1"
           >
             ← Back to Marketplace
           </button>
           <button
             onClick={() => navigate("/cart")}
-            className="rounded-full bg-orange-100 p-2 text-xl text-orange-700 hover:bg-orange-200 transition"
+            className="rounded-md bg-gray-50 p-2 text-xl text-blue-600 hover:bg-gray-100 transition active:scale-95"
           >
             🛒
           </button>
@@ -154,58 +154,58 @@ function ProductDetail() {
 
       {/* Two-Column Specification Product Matrix */}
       <section className="mx-auto max-w-5xl px-4 pt-8 sm:px-6 lg:px-8">
-        <div className="bg-white rounded-3xl border border-orange-200 p-6 sm:p-8 shadow-sm grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+        <div className="bg-white rounded-lg border border-gray-200 p-6 sm:p-8 shadow-sm grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
           
           {/* Left Block: Image Showcase */}
-          <div className="w-full aspect-square bg-slate-50 rounded-2xl overflow-hidden border border-orange-100 shadow-inner">
+          <div className="w-full aspect-square bg-gray-50 rounded-md overflow-hidden border border-gray-200">
             <img
               src={product.image}
               alt={product.name}
-              className="w-full h-full object-cover transition transform duration-300 hover:scale-105"
+              className="w-full h-full object-cover transition transform duration-300 hover:scale-105 will-change-transform"
             />
           </div>
 
           {/* Right Block: Product Details Meta Info */}
           <div className="flex flex-col justify-between h-full">
             <div>
-              <span className="inline-block bg-orange-100 text-orange-800 text-xs font-bold px-3 py-1 rounded-full mb-3 uppercase tracking-wider">
+              <span className="inline-block bg-blue-50 text-blue-700 text-xs font-bold px-3 py-1 rounded-md mb-3 uppercase tracking-wider">
                 {product.category}
               </span>
-              <h1 className="text-2xl sm:text-3xl font-bold text-orange-950 leading-tight">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight">
                 {product.name}
               </h1>
-              <p className="text-sm text-slate-500 mt-1 font-medium">
-                Crafted by: <span className="text-orange-800">{product.artisan}</span>
+              <p className="text-sm text-gray-500 mt-1 font-medium">
+                Crafted by: <span className="text-gray-700">{product.artisan}</span>
               </p>
 
-              <div className="text-3xl font-extrabold text-orange-600 mt-4 mb-6">
+              <div className="text-3xl font-extrabold text-blue-600 mt-4 mb-6">
                 ₹{product.price}
               </div>
 
-              <hr className="border-orange-100 my-4" />
+              <hr className="border-gray-200 my-4" />
 
-              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+              <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
                 About this craft item
               </h3>
-              <p className="text-slate-700 text-sm leading-relaxed whitespace-pre-line">
+              <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-line">
                 {product.description}
               </p>
             </div>
 
             {/* Bottom Actions Row Matrix Buttons */}
-            <div className="mt-8 pt-6 border-t border-orange-100 space-y-3">
+            <div className="mt-8 pt-6 border-t border-gray-200 space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <button
                   type="button"
                   onClick={handleAddToCart}
-                  className="w-full border border-orange-600 text-orange-600 hover:bg-orange-50 font-bold py-3 rounded-xl transition text-sm flex items-center justify-center gap-2"
+                  className="w-full border border-blue-600 text-blue-600 hover:bg-blue-50 font-bold py-3 rounded-md transition text-sm flex items-center justify-center gap-2 active:scale-95"
                 >
                   🛒 Add to Cart
                 </button>
                 <button
                   type="button"
                   onClick={handleBuyNow}
-                  className="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 rounded-xl transition text-sm shadow-md"
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-md transition text-sm shadow-md active:scale-95"
                 >
                   Buy Now
                 </button>
@@ -218,7 +218,7 @@ function ProductDetail() {
                   )}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition text-sm flex items-center justify-center gap-2 shadow-sm text-center"
+                  className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-md transition text-sm flex items-center justify-center gap-2 shadow-sm text-center active:scale-95"
                 >
                   💬 Chat with Artisan on WhatsApp
                 </a>

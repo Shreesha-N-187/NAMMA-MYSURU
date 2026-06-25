@@ -84,33 +84,33 @@ function CartPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-orange-50 via-amber-50 to-orange-100 pb-12">
+    <main className="min-h-screen bg-gray-50 pb-12">
       {toastMessage && (
-        <div className="fixed top-24 left-1/2 transform -translate-x-1/2 z-50 bg-slate-900/90 backdrop-blur-sm text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-lg transition-all duration-300">
+        <div className="fixed top-24 left-1/2 transform -translate-x-1/2 z-50 bg-gray-900/90 backdrop-blur-sm text-white px-5 py-2.5 rounded-md text-sm font-semibold shadow-lg transition-all duration-300">
           {toastMessage}
         </div>
       )}
 
       {/* Navbar */}
-      <nav className="sticky top-0 z-20 border-b border-orange-200/80 bg-white/80 backdrop-blur-md">
+      <nav className="sticky top-0 z-40 border-b border-gray-200 bg-white">
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
           <BackButton to="/customer-home" label="Continue shopping" />
-          <h1 className="text-lg font-bold text-orange-950">My Shopping Cart</h1>
+          <h1 className="text-lg font-bold text-blue-600">My Shopping Cart</h1>
           <div className="w-20" />
         </div>
       </nav>
 
       <section className="mx-auto max-w-5xl px-4 pt-8 sm:px-6 lg:px-8">
         {cart.length === 0 ? (
-          <div className="bg-white/60 backdrop-blur-md rounded-3xl border border-orange-200 p-12 text-center shadow-sm flex flex-col items-center justify-center">
+          <div className="bg-white rounded-lg border border-gray-200 p-12 text-center shadow-sm flex flex-col items-center justify-center">
             <span className="text-6xl mb-4">🛒</span>
-            <h2 className="text-xl font-bold text-orange-950">Your cart is empty</h2>
-            <p className="text-slate-500 text-sm mt-1 max-w-xs">
+            <h2 className="text-xl font-bold text-gray-900">Your cart is empty</h2>
+            <p className="text-gray-500 text-sm mt-1 max-w-xs">
               Explore unique handmade artifacts from verified creators in Mysuru!
             </p>
             <button
               onClick={() => navigate("/customer-home")}
-              className="mt-6 bg-orange-600 hover:bg-orange-700 text-white font-semibold px-6 py-2.5 rounded-xl text-sm transition shadow"
+              className="mt-6 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2.5 rounded-md text-sm transition active:scale-95 shadow"
             >
               Start Shopping
             </button>
@@ -121,34 +121,34 @@ function CartPage() {
               {cart.map((item) => (
                 <article
                   key={item.id}
-                  className="bg-white/80 backdrop-blur-md rounded-2xl border border-orange-200 p-4 flex gap-4 items-center shadow-sm"
+                  className="bg-white rounded-lg border border-gray-200 p-4 flex gap-4 items-center shadow-sm"
                 >
                   <img
                     src={item.image}
                     alt={item.name}
-                    className="w-20 h-20 rounded-xl object-cover border border-orange-100 flex-shrink-0"
+                    className="w-20 h-20 rounded-md object-cover border border-gray-200 flex-shrink-0"
                   />
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-bold text-orange-950 text-base truncate">{item.name}</h3>
-                    <p className="text-xs text-slate-400 mt-0.5">by {item.artisanName || "Local Artisan"}</p>
-                    <div className="text-orange-700 font-extrabold text-sm mt-2">₹{item.price}</div>
+                    <h3 className="font-bold text-gray-900 text-base truncate">{item.name}</h3>
+                    <p className="text-xs text-gray-400 mt-0.5">by {item.artisanName || "Local Artisan"}</p>
+                    <div className="text-blue-600 font-extrabold text-sm mt-2">₹{item.price}</div>
                   </div>
                   <div className="flex flex-col items-center gap-1.5 ml-auto">
-                    <div className="flex items-center border border-orange-200 rounded-lg overflow-hidden bg-orange-50/50">
+                    <div className="flex items-center border border-gray-200 rounded-md overflow-hidden bg-gray-50">
                       <button
                         type="button"
                         onClick={() => updateQuantity(item.id, -1)}
-                        className="px-2 py-1 text-orange-800 hover:bg-orange-100 font-bold text-sm transition"
+                        className="px-2 py-1 text-gray-700 hover:bg-gray-100 font-bold text-sm transition active:scale-95"
                       >
                         -
                       </button>
-                      <span className="px-2 text-sm font-bold text-orange-950 min-w-[24px] text-center">
+                      <span className="px-2 text-sm font-bold text-gray-900 min-w-[24px] text-center">
                         {item.quantity}
                       </span>
                       <button
                         type="button"
                         onClick={() => updateQuantity(item.id, 1)}
-                        className="px-2 py-1 text-orange-800 hover:bg-orange-100 font-bold text-sm transition"
+                        className="px-2 py-1 text-gray-700 hover:bg-gray-100 font-bold text-sm transition active:scale-95"
                       >
                         +
                       </button>
@@ -156,7 +156,7 @@ function CartPage() {
                     <button
                       type="button"
                       onClick={() => removeItem(item.id)}
-                      className="text-xs text-rose-500 hover:text-rose-700 transition font-semibold"
+                      className="text-xs text-red-500 hover:text-red-700 transition font-semibold active:scale-95"
                     >
                       Remove
                     </button>
@@ -165,34 +165,34 @@ function CartPage() {
               ))}
             </div>
 
-            <div className="bg-white/90 backdrop-blur-md rounded-3xl border border-orange-200 p-6 shadow-sm sticky top-24">
-              <h2 className="text-base font-bold text-orange-950 border-b border-orange-100 pb-3">
+            <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm sticky top-24">
+              <h2 className="text-base font-bold text-gray-900 border-b border-gray-200 pb-3">
                 Order Estimation Summary
               </h2>
               <div className="flex flex-col gap-2.5 text-sm mt-4">
-                <div className="flex justify-between text-slate-600">
+                <div className="flex justify-between text-gray-600">
                   <span>Subtotal</span>
                   <span>₹{subtotal}</span>
                 </div>
-                <div className="flex justify-between text-slate-600">
+                <div className="flex justify-between text-gray-600">
                   <span>GST (18%)</span>
                   <span>₹{gstAmount}</span>
                 </div>
-                <hr className="border-orange-100 my-2" />
-                <div className="flex justify-between text-base font-bold text-orange-950">
+                <hr className="border-gray-200 my-2" />
+                <div className="flex justify-between text-base font-bold text-gray-900">
                   <span>Total Amount</span>
-                  <span className="text-xl text-orange-700">₹{grandTotal}</span>
+                  <span className="text-xl text-blue-600">₹{grandTotal}</span>
                 </div>
               </div>
               <button
                 onClick={handleCheckout}
-                className="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 rounded-xl shadow-md transition mt-6 text-center text-sm"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-md shadow-md transition active:scale-95 mt-6 text-center text-sm"
               >
                 Pay Now ₹{grandTotal}
               </button>
               <p
                 onClick={() => navigate("/customer-home")}
-                className="text-center text-xs text-orange-700 hover:underline mt-4 cursor-pointer"
+                className="text-center text-xs text-blue-600 hover:underline mt-4 cursor-pointer"
               >
                 Continue Shopping
               </p>

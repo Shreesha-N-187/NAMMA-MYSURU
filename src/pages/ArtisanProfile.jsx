@@ -51,7 +51,7 @@ function ArtisanProfile() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600" />
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
       </div>
     );
   }
@@ -62,7 +62,7 @@ function ArtisanProfile() {
         <p className="text-2xl font-bold text-gray-700">Artisan not found</p>
         <button
           onClick={() => navigate("/")}
-          className="bg-orange-600 text-white px-6 py-2 rounded-xl"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md"
         >
           Go Home
         </button>
@@ -76,26 +76,26 @@ function ArtisanProfile() {
     : null;
 
   return (
-    <main className="min-h-screen bg-orange-50">
+    <main className="min-h-screen bg-white">
       {/* Navbar */}
-      <nav className="bg-white border-b border-orange-100 px-6 py-4 flex items-center justify-between">
+      <nav className="bg-white border-b border-gray-200 sticky top-0 z-40 px-6 py-4 flex items-center justify-between">
         <button
           onClick={() => navigate(-1)}
-          className="text-orange-600 font-medium text-sm hover:text-orange-700"
+          className="text-gray-500 hover:text-gray-700 font-medium text-sm transition-colors"
         >
           ← Back
         </button>
-        <span className="font-bold text-orange-700 text-lg">Namma Mysuru</span>
+        <span className="font-bold text-blue-600 text-lg">Namma Mysuru</span>
         <div />
       </nav>
 
       <div className="max-w-3xl mx-auto px-4 py-8">
 
         {/* Artisan Header Card */}
-        <div className="bg-white rounded-2xl shadow-sm border border-orange-100 p-6 mb-6">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
           <div className="flex items-start gap-5">
             {/* Avatar */}
-            <div className="w-20 h-20 rounded-full bg-orange-100 flex items-center justify-center text-3xl font-bold text-orange-600 flex-shrink-0">
+            <div className="w-20 h-20 rounded-full bg-gray-50 flex items-center justify-center text-3xl font-bold text-blue-600 flex-shrink-0">
               {artisan.name?.charAt(0).toUpperCase() || "A"}
             </div>
 
@@ -104,7 +104,7 @@ function ArtisanProfile() {
               <h1 className="text-2xl font-bold text-gray-900">{artisan.name}</h1>
 
               {artisan.craftType && (
-                <span className="inline-block mt-1 bg-orange-100 text-orange-700 text-xs font-medium px-3 py-1 rounded-full">
+                <span className="inline-block mt-1 bg-blue-50 text-blue-700 text-xs font-medium px-3 py-1 rounded-md">
                   {artisan.craftType}
                 </span>
               )}
@@ -124,17 +124,17 @@ function ArtisanProfile() {
           </div>
 
           {/* Stats row */}
-          <div className="flex gap-4 mt-5 pt-4 border-t border-orange-50">
+          <div className="flex gap-4 mt-5 pt-4 border-t border-gray-200">
             <div className="text-center flex-1">
-              <p className="text-xl font-bold text-orange-600">{products.length}</p>
+              <p className="text-xl font-bold text-blue-600">{products.length}</p>
               <p className="text-xs text-gray-400">Products</p>
             </div>
             <div className="text-center flex-1">
-              <p className="text-xl font-bold text-orange-600">✓</p>
+              <p className="text-xl font-bold text-blue-600">✓</p>
               <p className="text-xs text-gray-400">Verified</p>
             </div>
             <div className="text-center flex-1">
-              <p className="text-xl font-bold text-orange-600">Mysuru</p>
+              <p className="text-xl font-bold text-blue-600">Mysuru</p>
               <p className="text-xs text-gray-400">Location</p>
             </div>
           </div>
@@ -145,7 +145,7 @@ function ArtisanProfile() {
               href={whatsappLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-4 flex items-center justify-center gap-2 w-full bg-green-500 hover:bg-green-600 text-white font-medium py-2.5 rounded-xl transition-colors"
+              className="mt-4 flex items-center justify-center gap-2 w-full bg-green-500 hover:bg-green-600 text-white font-medium py-2.5 rounded-md transition-colors active:scale-95"
             >
               💬 WhatsApp {artisan.name?.split(" ")[0]}
             </a>
@@ -158,7 +158,7 @@ function ArtisanProfile() {
         </h2>
 
         {products.length === 0 ? (
-          <div className="bg-white rounded-2xl p-8 text-center border border-orange-100">
+          <div className="bg-white rounded-lg p-8 text-center border border-gray-200">
             <p className="text-gray-400 text-sm">No products listed yet.</p>
           </div>
         ) : (
@@ -166,7 +166,7 @@ function ArtisanProfile() {
             {products.map((product) => (
               <div
                 key={product.id}
-                className="bg-white rounded-2xl border border-orange-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow"
+                className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow will-change-transform"
               >
                 {/* Product Image */}
                 <img
@@ -177,13 +177,13 @@ function ArtisanProfile() {
 
                 <div className="p-4">
                   {/* Category */}
-                  <span className="text-xs bg-orange-50 text-orange-600 px-2 py-0.5 rounded-full font-medium">
+                  <span className="text-xs bg-gray-50 text-blue-700 px-2 py-0.5 rounded-md font-medium">
                     {product.category}
                   </span>
 
                   {/* Name + Price */}
-                  <h3 className="font-semibold text-gray-800 mt-2">{product.name}</h3>
-                  <p className="text-orange-600 font-bold text-lg mt-0.5">
+                  <h3 className="font-semibold text-gray-900 mt-2">{product.name}</h3>
+                  <p className="text-blue-600 font-bold text-lg mt-0.5">
                     ₹{product.price?.toLocaleString()}
                   </p>
 
@@ -200,7 +200,7 @@ function ArtisanProfile() {
                       href={`https://wa.me/91${whatsappNumber.replace(/\D/g, "")}?text=Hi ${artisan.name}, I'm interested in your product: ${product.name} (₹${product.price}) on Namma Mysuru!`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mt-3 flex items-center justify-center gap-1 w-full border border-green-500 text-green-600 hover:bg-green-50 text-sm font-medium py-2 rounded-xl transition-colors"
+                      className="mt-3 flex items-center justify-center gap-1 w-full border border-green-500 text-green-600 hover:bg-green-50 text-sm font-medium py-2 rounded-md transition-colors active:scale-95"
                     >
                       💬 Enquire via WhatsApp
                     </a>

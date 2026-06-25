@@ -32,7 +32,7 @@ function ArtisanDashboard() {
   const [copyFeedback, setCopyFeedback] = useState("");
 
   const profileLink = useMemo(
-    () => (uid ? `namma-mysuru.vercel.app/artisan/${uid}` : ""),
+    () => (uid ? `${window.location.origin}/artisan/${uid}` : ""),
     [uid]
   );
 

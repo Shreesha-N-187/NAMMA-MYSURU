@@ -43,35 +43,35 @@ function OrderHistory() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-orange-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600" />
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
       </div>
     );
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-orange-50 via-amber-50 to-orange-100 pb-8">
+    <main className="min-h-screen bg-gray-50 pb-8">
 
       {/* Back Button Bar */}
-      <div className="bg-white border-b border-gray-100 px-4 py-2.5 flex items-center">
+      <div className="bg-white border-b border-gray-200 px-4 py-2.5 flex items-center">
         <BackButton to="/customer-home" label="Back to shop" />
       </div>
 
       <div className="max-w-4xl mx-auto px-4 pt-8 sm:px-6 lg:px-8">
-        <h1 className="text-3xl font-bold tracking-tight text-orange-950 mb-2">
+        <h1 className="text-3xl font-bold tracking-tight text-gray-900 mb-2">
           Your Order History
         </h1>
-        <p className="text-sm text-slate-600 mb-8">
+        <p className="text-sm text-gray-600 mb-8">
           Track and view your authentic Mysuru craft purchases.
         </p>
 
         {orders.length === 0 ? (
-          <div className="bg-white rounded-3xl p-12 text-center border border-orange-200/60 shadow-sm">
+          <div className="bg-white rounded-lg p-12 text-center border border-gray-200 shadow-sm">
             <span className="text-4xl block mb-3">📦</span>
-            <p className="text-slate-500 font-medium">You haven't placed any orders yet.</p>
+            <p className="text-gray-500 font-medium">You haven't placed any orders yet.</p>
             <button
               onClick={() => navigate("/customer-home")}
-              className="mt-4 inline-flex items-center justify-center bg-orange-600 hover:bg-orange-700 text-white font-semibold text-sm px-5 py-2.5 rounded-xl transition"
+              className="mt-4 inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm px-5 py-2.5 rounded-md transition active:scale-95"
             >
               Start Shopping
             </button>
@@ -81,16 +81,16 @@ function OrderHistory() {
             {orders.map((order) => (
               <section
                 key={order.id}
-                className="bg-white rounded-3xl border border-orange-200/60 shadow-sm overflow-hidden"
+                className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden"
               >
-                <div className="bg-orange-50/60 px-6 py-4 border-b border-orange-100 flex flex-wrap items-center justify-between gap-4">
+                <div className="bg-gray-50 px-6 py-4 border-b border-gray-200 flex flex-wrap items-center justify-between gap-4">
                   <div>
-                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Order ID</p>
-                    <p className="text-xs font-mono text-slate-700">{order.id}</p>
+                    <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Order ID</p>
+                    <p className="text-xs font-mono text-gray-700">{order.id}</p>
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Date Placed</p>
-                    <p className="text-sm font-medium text-slate-700">
+                    <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Date Placed</p>
+                    <p className="text-sm font-medium text-gray-700">
                       {order.createdAt?.seconds
                         ? new Date(order.createdAt.seconds * 1000).toLocaleDateString("en-IN", {
                             day: "numeric",
@@ -101,18 +101,18 @@ function OrderHistory() {
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Status</p>
-                    <span className="inline-block bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-0.5 rounded-full mt-0.5">
+                    <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Status</p>
+                    <span className="inline-block bg-green-100 text-green-800 text-xs font-bold px-2.5 py-0.5 rounded-md mt-0.5">
                       {order.status || "Paid"}
                     </span>
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider text-right">Total Amount</p>
-                    <p className="text-base font-extrabold text-orange-700">₹{order.total}</p>
+                    <p className="text-xs font-bold text-gray-400 uppercase tracking-wider text-right">Total Amount</p>
+                    <p className="text-base font-extrabold text-blue-600">₹{order.total}</p>
                   </div>
                 </div>
 
-                <div className="divide-y divide-orange-100 px-6">
+                <div className="divide-y divide-gray-100 px-6">
                   {order.items?.map((item, index) => (
                     <div key={item.id || index} className="py-4 flex items-center justify-between gap-4">
                       <div className="flex items-center gap-4">
@@ -120,18 +120,18 @@ function OrderHistory() {
                           <img
                             src={item.image}
                             alt={item.name}
-                            className="w-16 h-16 object-cover rounded-xl border border-orange-100 flex-shrink-0"
+                            className="w-16 h-16 object-cover rounded-md border border-gray-200 flex-shrink-0"
                           />
                         )}
                         <div>
-                          <h4 className="font-bold text-orange-950 text-sm sm:text-base">{item.name}</h4>
-                          <p className="text-xs text-slate-500">by {item.artisan || "Local Artisan"}</p>
-                          <p className="text-xs text-slate-400 mt-0.5">
-                            Qty: <span className="font-semibold text-slate-700">{item.quantity}</span>
+                          <h4 className="font-bold text-gray-900 text-sm sm:text-base">{item.name}</h4>
+                          <p className="text-xs text-gray-500">by {item.artisan || "Local Artisan"}</p>
+                          <p className="text-xs text-gray-400 mt-0.5">
+                            Qty: <span className="font-semibold text-gray-700">{item.quantity}</span>
                           </p>
                         </div>
                       </div>
-                      <p className="font-bold text-slate-800 text-sm">₹{item.price * item.quantity}</p>
+                      <p className="font-bold text-gray-800 text-sm">₹{item.price * item.quantity}</p>
                     </div>
                   ))}
                 </div>
