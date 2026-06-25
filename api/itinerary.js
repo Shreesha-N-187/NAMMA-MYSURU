@@ -18,12 +18,11 @@ Consider interests: animals/cats → jin-min-cat; anime/food → uchiha-cafe;
 For each spot, write a one-line personalised "note" tied to the user's preferences
 (max 12 words, warm enthusiastic tone, specific to why THIS user would love it).
 
-Respond ONLY with valid JSON. No preamble. No markdown. No backticks.
+Respond ONLY with a valid JSON object matching the schema below. No preamble. No markdown blocks.
 Format exactly:
 {
   "itinerary": [
-    { "spotId": "hasiru-mane", "name": "Hasiru Mane", "arrivalTime": "09:00 AM", "duration": 120, "note": "Perfect morning escape in a medicinal plant paradise!" },
-    ...
+    { "spotId": "hasiru-mane", "name": "Hasiru Mane", "arrivalTime": "09:00 AM", "duration": 120, "note": "Perfect morning escape in a medicinal plant paradise!" }
   ]
 }`;
 
@@ -50,28 +49,36 @@ export default async function handler(req, res) {
             role: "user",
             parts: [{ text: `Time available: ${timeAvailable}. Interests: ${interests}. Budget: ${budget}. Mobility: ${mobility}.` }]
           }],
-          generationConfig: { maxOutputTokens: 500, temperature: 0.8 }
+          generationConfig: { 
+            maxOutputTokens: 800, // Increased slightly to prevent accidental cuts on longer strings
+            temperature: 0.2,     // Lowered temperature slightly to make structural JSON output more consistent
+            responseMimeType: "application/json" // CRITICAL FIX: Forces Gemini to output pure structured JSON
+          }
         }),
       }
     );
 
     if (!response.ok) {
       const err = await response.json();
-      console.error("Gemini error:", err);
-      return res.status(500).json({ error: "Could not generate itinerary" });
+      console.error("Gemini API error context:", err);
+      return res.status(500).json({ error: "Could not generate itinerary from upstream service" });
     }
 
     const data = await response.json();
     let text = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
-    if (!text) return res.status(500).json({ error: "Could not generate itinerary" });
+    if (!text) return res.status(500).json({ error: "Empty response received from itinerary cluster" });
 
-    text = text.replace(/```json|```/g, "").trim();
+    // Defensive regex cleaning just in case fallback behaviors trigger markdown block enclosures
+    if (text.includes("```")) {
+      text = text.replace(/```json/g, "").replace(/```/g, "").trim();
+    }
+
     const parsed = JSON.parse(text);
-
     return res.status(200).json(parsed);
+
   } catch (error) {
-    console.error("Server error:", error);
-    return res.status(500).json({ error: "Could not generate itinerary" });
+    console.error("Server-side parsing execution error:", error);
+    return res.status(500).json({ error: "Internal processing failed during itinerary assembly" });
   }
 }
