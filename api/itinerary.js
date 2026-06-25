@@ -15,18 +15,7 @@ Consider mobility: prefer less walking → group nearby spots (Gokulam spots are
 Consider interests: animals/cats → jin-min-cat; anime/food → uchiha-cafe;
                     nature/peaceful → hasiru-mane; healthy/sugar-free → loco-chocolates, mr-co-cane.
 
-For each spot, write a one-line personalised "note" tied to the user's preferences.
-CRITICAL FORMATTING RULES FOR THE NOTE:
-- Max 12 words. Warm, enthusiastic tone.
-- Absolutely DO NOT include any double quotes ("), single quotes ('), or backticks (\`) INSIDE the note text.
-- Must be on a single flat line. No literal newlines or break characters.
-
-Respond ONLY with a valid JSON object matching this exact schema:
-{
-  "itinerary": [
-    { "spotId": "hasiru-mane", "name": "Hasiru Mane", "arrivalTime": "09:00 AM", "duration": 120, "note": "Perfect morning escape in a medicinal plant paradise" }
-  ]
-}`;
+For each spot, write a one-line personalised "note" tied to the user's preferences (max 12 words, warm enthusiastic tone).`;
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -52,9 +41,29 @@ export default async function handler(req, res) {
             parts: [{ text: `Time available: ${timeAvailable}. Interests: ${interests}. Budget: ${budget}. Mobility: ${mobility}.` }]
           }],
           generationConfig: { 
-            maxOutputTokens: 800,
-            temperature: 0.1, // Dropped to 0.1 to maximize formatting reliability and eliminate stray characters
-            responseMimeType: "application/json"
+            temperature: 0.2,
+            responseMimeType: "application/json",
+            // CRITICAL FIX: Explicitly enforce the structural schema layout at the API level
+            responseSchema: {
+              type: "OBJECT",
+              properties: {
+                itinerary: {
+                  type: "ARRAY",
+                  items: {
+                    type: "OBJECT",
+                    properties: {
+                      spotId: { type: "STRING" },
+                      name: { type: "STRING" },
+                      arrivalTime: { type: "STRING" },
+                      duration: { type: "NUMBER" },
+                      note: { type: "STRING" }
+                    },
+                    required: ["spotId", "name", "arrivalTime", "duration", "note"]
+                  }
+                }
+              },
+              required: ["itinerary"]
+            }
           }
         }),
       }
@@ -63,44 +72,25 @@ export default async function handler(req, res) {
     if (!response.ok) {
       const err = await response.json();
       console.error("Gemini API error context:", err);
+      
+      // Handle the 503 high demand spike gracefully for the UI
+      if (response.status === 503) {
+        return res.status(503).json({ error: "Gemini servers are busy. Please try again in a few seconds." });
+      }
       return res.status(500).json({ error: "Could not generate itinerary from upstream service" });
     }
 
     const data = await response.json();
-    let text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!text) return res.status(500).json({ error: "Empty response received from itinerary cluster" });
 
-    // Clean up markdown block wrappers if present
-    if (text.includes("```")) {
-      text = text.replace(/```json/g, "").replace(/```/g, "").trim();
-    }
-
-    // Defensive replacement for literal line-breaks inside unparsed string parameters
-    text = text.replace(/\n/g, " ").replace(/\r/g, " ");
-
-    // Ensure double spacing errors don't impact structural markers
-    text = text.replace(/\s+/g, " ").trim();
-
-    try {
-      const parsed = JSON.parse(text);
-      return res.status(200).json(parsed);
-    } catch (parseError) {
-      console.error("JSON Clean-Parse failed. Target text was:", text);
-      
-      // Fallback: If it still fails due to a stray character, strip the note dynamically using regex matching
-      // to guarantee the client gets valid JSON UI components.
-      try {
-        const sanitizedText = text.replace(/"note"\s*:\s*".*?"/g, '"note":"Enjoy your custom tour!"');
-        const fallbackParsed = JSON.parse(sanitizedText);
-        return res.status(200).json(fallbackParsed);
-      } catch (nestedError) {
-        return res.status(500).json({ error: "Internal structural validation failed" });
-      }
-    }
+    // Directly parse the guaranteed structure returned by responseSchema
+    const parsed = JSON.parse(text);
+    return res.status(200).json(parsed);
 
   } catch (error) {
-    console.error("Server-side execution error:", error);
+    console.error("Server-side parsing execution error:", error);
     return res.status(500).json({ error: "Internal processing failed during itinerary assembly" });
   }
 }
