@@ -21,7 +21,8 @@ function RoleSelect() {
 
         <div className="flex-1 flex items-center">
           <p className="text-white/90 text-xl font-medium leading-relaxed max-w-xs">
-            5 hidden gems personally verified by our team. Real people. Real places. Real Mysuru.
+            Team Verified Hidden Gems.
+            Real people. Real places. Real Mysuru.
           </p>
         </div>
 
